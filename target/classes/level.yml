@@ -1,0 +1,26 @@
+Level:
+  FirstExp: 100.0
+  IncreaseRate: 1.08
+  IncreasePlus: 47
+  Limit: 25
+Points:
+  Int:
+    1:
+      Exp: 2
+      GatherMonster: -1
+  Vit:
+    1:
+      Stamina: 20
+    2:
+      Health: 2
+  Atk:
+    1:
+      Weapon: 1
+    2:
+      Artifact: 5
+    3:
+      Weapon: 5
+  Luc:
+    1:
+      Lucky: 3
+      GatherRelic: 10

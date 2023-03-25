@@ -1,0 +1,26 @@
+name: DiveCore
+version: ${project.version}
+main: com.flora30.divecore.DiveCore
+api-version: 1.13
+authors: [Flora]
+description: 深淵を覗くものは、深淵にもまた覗かれているのだ
+depend: [Citizens,MythicMobs,LibsDisguises,WorldEdit,ProtocolLib,DiveDB,DiveAPI]
+loadbefore: [DiveRegion]
+commands:
+  level:
+    permission-message: Unknown command. Type "/help" for help.
+    permission: divecore.*
+  cook:
+    permission-message: Unknown command. Type "/help" for help.
+    permission: divecore.*
+  adm:
+    permission-message: Unknown command. Type "/help" for help.
+    permission: divecore.*
+  death:
+    permission-message: Unknown command. Type "/help" for help.
+    permission: divecore.death
+permissions:
+  divecore.*:
+    default: op
+  divecore.death:
+    default: true
