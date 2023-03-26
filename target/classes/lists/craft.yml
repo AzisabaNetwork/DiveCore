@@ -1,6 +1,0 @@
-1:
-  layer: layer1
-  amount: 3
-  requires:
-    - 300,1
-    - 301,2

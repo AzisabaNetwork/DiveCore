@@ -1,7 +1,0 @@
-foodInterval: 100
-1:
-  before: 100
-  after: 10
-2:
-  before: 102
-  after: 12
