@@ -1,7 +1,11 @@
 package com.flora30.divecore.base;
 
+import com.flora30.data.Base;
+import com.flora30.data.BaseObject;
 import com.flora30.diveapi.DiveAPI;
 import com.flora30.diveapi.event.LayerLoadEvent;
+import data.BaseDataObject;
+import data.BaseLocation;
 import io.lumine.xikage.mythicmobs.MythicMobs;
 import io.lumine.xikage.mythicmobs.api.exceptions.InvalidMobTypeException;
 import org.bukkit.Bukkit;
@@ -46,18 +50,22 @@ public class BaseTrigger {
 
     public static void onTickBaseGuard(){
         long lagLimit_ms = DiveAPI.lagTime + 50L;
-        for (Base base : BaseMain.baseMap.values()) {
+
+        for (int id : BaseObject.INSTANCE.getBaseMap().keySet()) {
+            Base base = BaseObject.INSTANCE.getBaseMap().get(id);
+            BaseLocation baseLocation = BaseDataObject.INSTANCE.getBaseLocationMap().get(id);
+
             if (!base.isPrepared()){
                 // prepare location set -> chunk load lagging
                 if (System.currentTimeMillis() > lagLimit_ms) {
                     continue;
                 }
 
-                Location location = base.getLocation();
+                Location location = baseLocation.getLocation();
                 if(!location.isWorldLoaded()) continue;
                 if (location.getBlock().getType() != Material.CAMPFIRE && location.getBlock().getType() != Material.SOUL_CAMPFIRE){
                     location.getBlock().setType(Material.CAMPFIRE);
-                    ((Campfire)location.getBlock().getBlockData()).setFacing(base.getFace());
+                    ((Campfire)location.getBlock().getBlockData()).setFacing(baseLocation.getFace());
                 }
                 base.setPrepared(true);
             }
@@ -68,7 +76,7 @@ public class BaseTrigger {
                 }
 
                 try{
-                    Location spawn = base.getLocation().clone();
+                    Location spawn = baseLocation.getLocation().clone();
                     MythicMobs.inst().getAPIHelper().spawnMythicMob("BaseGuard",spawn.add(0.5,0,0.5));
                 } catch (InvalidMobTypeException e){
                     Bukkit.getLogger().info("[DiveCore-Base]mob名BaseGuardが確認出来ません");
@@ -78,16 +86,19 @@ public class BaseTrigger {
     }
 
     public static void onTick(){
-        for (Base base : BaseMain.baseMap.values()){
+        for (Base base : BaseObject.INSTANCE.getBaseMap().values()){
+            // 拠点の残り時間を減らす
             if (base.getRemain() != 0){
                 base.setRemain(base.getRemain() - 1);
             }
+
+            // 拠点の残り時間が0になったとき
             if (base.getRemain() == 0 && base.getLevel() > 0){
                 base.setLevel(0);
-                if (base.model != null) {
-                    Entity beforeModel = Bukkit.getEntity(base.model);
+                if (base.getModel() != null) {
+                    Entity beforeModel = Bukkit.getEntity(base.getModel());
                     if(beforeModel != null) beforeModel.remove();
-                    base.model = null;
+                    base.setModel(null);
                 }
             }
         }

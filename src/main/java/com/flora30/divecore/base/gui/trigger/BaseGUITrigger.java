@@ -1,7 +1,6 @@
 package com.flora30.divecore.base.gui.trigger;
 
 import com.flora30.diveapi.plugins.ItemAPI;
-import com.flora30.divecore.base.Base;
 import com.flora30.divecore.base.BaseMain;
 import com.flora30.divecore.base.gui.BaseGUI;
 import com.flora30.divecore.base.gui.BaseUpgradeGUI;

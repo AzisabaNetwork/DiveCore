@@ -107,7 +107,7 @@ public abstract class Config {
         }
     }
 
-    public boolean loadOrDefault(String pluginType, FileConfiguration file, String key, Boolean def){
+    public static boolean loadOrDefault(String pluginType, FileConfiguration file, String key, Boolean def){
         if (file != null && file.isBoolean(key)){
             return file.getBoolean(key);
         }

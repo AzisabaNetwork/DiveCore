@@ -1,7 +1,13 @@
 package com.flora30.divecore.base;
 
+import com.flora30.data.Base;
+import com.flora30.data.BaseObject;
 import com.flora30.divecore.DiveCore;
 import com.flora30.divecore.tools.Config;
+import data.BaseDataObject;
+import data.BaseLayer;
+import data.BaseLocation;
+import data.BaseRequire;
 import org.bukkit.Bukkit;
 import org.bukkit.Location;
 import org.bukkit.Material;
@@ -45,21 +51,19 @@ public class BaseConfig extends Config {
                     continue;
                 }
 
-                Base base = new Base();
-                base = (readBaseLoc(base, file.getString(i+".location")));
-                if (base == null){
-                    continue;
-                }
-                base.setTown(loadOrDefault("Base",file,i+".isTown",false));
+                BaseLocation baseLocation = loadBaseLoc(file,id);
+                if (baseLocation == null) continue;
 
-                BaseMain.baseMap.put(id,base);
+                BaseDataObject.INSTANCE.getBaseLocationMap().put(id,baseLocation);
+                Base base = new Base();
+                BaseObject.INSTANCE.getBaseMap().put(id,base);
                 count++;
 
                 if (overrideMode) {
-                    Location location = base.getLocation();
+                    Location location = baseLocation.getLocation();
                     if (location.getBlock().getType() != Material.CAMPFIRE && location.getBlock().getType() != Material.SOUL_CAMPFIRE){
                         location.getBlock().setType(Material.CAMPFIRE);
-                        ((Campfire)location.getBlock().getBlockData()).setFacing(base.getFace());
+                        ((Campfire)location.getBlock().getBlockData()).setFacing(baseLocation.getFace());
                     }
                 }
                 base.setPrepared(true);
@@ -79,10 +83,12 @@ public class BaseConfig extends Config {
 
     }
 
-    public static Base readBaseLoc(Base base, String line){
+    public static BaseLocation loadBaseLoc(FileConfiguration config, int id){
+        String line = config.getString(id+".location");
         if (line == null){
             return null;
         }
+
         String[] split = line.split(",");
         int x,y,z;
         BlockFace face;
@@ -101,70 +107,74 @@ public class BaseConfig extends Config {
             return null;
         }
 
-        base.setLocation(world.getBlockAt(x,y,z).getLocation());
-        base.setFace(face);
-
-        return base;
+        return new BaseLocation(
+                world.getBlockAt(x,y,z).getLocation(),
+                face,
+                loadOrDefault("Base",config,id+".isTown",false)
+        );
     }
 
     public static void loadBaseData(String key, ConfigurationSection section){
+        // 拠点の設定ymlにbase.1のセクションが書かれている時だけ読み込む
         if (!section.isList("base.1")){
             Bukkit.getLogger().info("[DiveCore-Base]拠点レベル情報の読み込みに失敗しました(エリア: "+key+")");
             return;
         }
         List<String> requireList = section.getStringList("base.1");
-        BaseRequire requireFirst = loadRequire(requireList, key, 1);
-        if (requireFirst.getRequireMap().isEmpty()){
-            Bukkit.getLogger().info("[DiveCore-Base]拠点レベル情報の読み込みに失敗しました(エリア: "+key+")");
-            return;
-        }
+        BaseRequire require = loadRequire(requireList, key, 1);
 
-        BaseData data = new BaseData();
-        data.getLevelMap().put(1,requireFirst);
+        BaseLayer baseLayer = new BaseLayer();
+        baseLayer.getLevelMap().put(1,require);
 
-        for (int i = 2; i <= 4;i++){
-            BaseRequire require = loadRequire(section.getStringList("base."+i), key, i);
-
-            if (require.getRequireMap().isEmpty()){
-                data.getLevelMap().put(i,requireFirst);
-            }
-            else{
-                data.getLevelMap().put(i,require);
-            }
-        }
-
-        BaseMain.baseDataMap.put(key,data);
+        BaseDataObject.INSTANCE.getBaseLayerMap().put(key,baseLayer);
     }
 
     public static BaseRequire loadRequire(List<String> stringList, String layer, int level){
-        BaseRequire require = new BaseRequire();
+        int require1Id = -1;
+        int require1Amount = 0;
+        int require2Id = -1;
+        int require2Amount = 0;
+
+        int count = 1;
         for (String str : stringList){
             String[] loaded = str.split(",");
             try{
-                int id = Integer.parseInt(loaded[0]);
-                int amount = Integer.parseInt(loaded[1]);
-                require.getRequireMap().put(id,amount);
+                switch (count) {
+                    case 1 -> {
+                        require1Id = Integer.parseInt(loaded[0]);
+                        require1Amount = Integer.parseInt(loaded[1]);
+                        count++;
+                    }
+                    case 2 -> {
+                        require2Id = Integer.parseInt(loaded[0]);
+                        require2Amount = Integer.parseInt(loaded[1]);
+                        count++;
+                    }
+                    default -> Bukkit.getLogger().info("[DiveCore-Base]必要アイテムの3つ目以降は読み込みません（"+layer+" - "+level+" - ["+str+"]）");
+                }
             } catch (NumberFormatException | ArrayIndexOutOfBoundsException e){
                 Bukkit.getLogger().info("[DiveCore-Base]必要アイテムのロードに失敗しました（"+layer+" - "+level+" - ["+str+"]）");
             }
         }
-        return require;
+
+        return new BaseRequire(require1Id,require1Amount,require2Id,require2Amount);
     }
 
     public static void save(String layer, int id){
-        Base base = BaseMain.baseMap.get(id);
-        if (base == null){
+        BaseLocation baseLocation = BaseDataObject.INSTANCE.getBaseLocationMap().get(id);
+        if (baseLocation == null){
             Bukkit.getLogger().info("[DiveCore-Base]保存失敗(Null - "+id+")");
             return;
         }
+
         for (File from : files) {
             if (!from.getName().replace(".yml","").equals(layer)){
                 continue;
             }
             FileConfiguration file = YamlConfiguration.loadConfiguration(from);
 
-            file.set(id+".isTown",base.isTown());
-            file.set(id+".location",composeBaseLoc(base));
+            file.set(id+".isTown",baseLocation.isTown());
+            file.set(id+".location",composeBaseLoc(baseLocation));
             try{
                 file.save(from);
                 Bukkit.getLogger().info("[DiveCore-Base]保存成功("+id+")");
@@ -204,8 +214,8 @@ public class BaseConfig extends Config {
         Bukkit.getLogger().info("[DiveCore-Base]削除に失敗しました(検索結果なし - "+targetId+")");
     }
 
-    private static String composeBaseLoc(Base base){
-        Location loc = base.getLocation();
-        return loc.getWorld().getName()+","+loc.getBlockX()+","+loc.getBlockY()+","+loc.getBlockZ()+","+base.getFace();
+    private static String composeBaseLoc(BaseLocation baseLocation){
+        Location loc = baseLocation.getLocation();
+        return loc.getWorld().getName()+","+loc.getBlockX()+","+loc.getBlockY()+","+loc.getBlockZ()+","+baseLocation.getFace();
     }
 }

@@ -1,7 +1,6 @@
 package com.flora30.divecore.base.gui;
 
 import com.flora30.diveapi.tools.GuiItem;
-import com.flora30.divecore.base.Base;
 import com.flora30.divecore.base.BaseMain;
 import org.bukkit.Bukkit;
 import org.bukkit.ChatColor;
