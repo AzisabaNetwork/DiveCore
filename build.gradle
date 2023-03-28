@@ -58,6 +58,7 @@ dependencies {
     compileOnly 'com.sk89q.worldedit:worldedit-bukkit:7.2.6'
     compileOnly 'com.sk89q.worldedit:worldedit-core:7.2.6'
     compileOnly 'net.md-5:bungeecord-api:1.17-R0.1-SNAPSHOT'
+
     compileOnly fileTree('libs')
 }
 
