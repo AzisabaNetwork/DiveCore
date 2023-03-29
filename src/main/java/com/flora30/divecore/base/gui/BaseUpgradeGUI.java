@@ -1,10 +1,13 @@
 package com.flora30.divecore.base.gui;
 
+import com.flora30.data.Base;
+import com.flora30.data.BaseObject;
 import com.flora30.diveapi.plugins.ItemAPI;
 import com.flora30.diveapi.plugins.RegionAPI;
 import com.flora30.diveapi.tools.GuiItem;
 import com.flora30.divecore.base.BaseData;
 import com.flora30.divecore.base.BaseMain;
+import data.*;
 import org.bukkit.Bukkit;
 import org.bukkit.ChatColor;
 import org.bukkit.Location;
@@ -25,32 +28,30 @@ public class BaseUpgradeGUI {
     }
 
     private static Inventory create(int baseId) {
-        Base base = BaseMain.baseMap.get(baseId);
+        Base base = BaseObject.INSTANCE.getBaseMap().get(baseId);
+        BaseLocation baseLocation = BaseDataObject.INSTANCE.getBaseLocationMap().get(baseId);
+
+        // 次のレベルの必要素材を取得
+        BaseLayer baseLayer = BaseDataObject.INSTANCE.getBaseLayerMap().get(LayerObject.INSTANCE.getLayerName(baseLocation.getLocation()));
+        BaseRequire baseRequire = baseLayer.getLevelMap().get(base.getLevel()+1);
+
         Inventory gui = Bukkit.createInventory(null,27,"拠点強化");
         for (int i = 0; i < 27; i++){
             gui.setItem(i, GuiItem.getItem(Material.GRAY_STAINED_GLASS_PANE));
         }
 
-        gui.setItem(4,getNewBaseIcon(base.getLocation(),base.getLevel() + 1));
+        gui.setItem(4,getNewBaseIcon(baseLocation.getLocation(),base.getLevel() + 1));
 
-        BaseData data = BaseMain.baseDataMap.get(RegionAPI.getLayerName(base.getLocation()));
-        BaseRequire require = data.getLevelMap().get(base.getLevel()+1);
-
-        List<Integer> itemIdList;
-        if (base.isTown()){
-            itemIdList = new ArrayList<>();
+        if (baseLocation.isTown()){
+            gui.setItem(11,null);
+            gui.setItem(15,null);
         }
         else{
-            itemIdList = new ArrayList<>(require.getRequireMap().keySet());
-        }
-        for (int i = 0; i < itemIdList.size() && i < 5; i++){
-            int itemId = itemIdList.get(i);
-            int amount = require.getRequireMap().get(itemId);
-
-            gui.setItem(getSlot(i),getRequireItem(itemId,amount));
+            gui.setItem(11,getRequireItem(baseRequire.getRequire1Id(),baseRequire.getRequire1Amount()));
+            gui.setItem(15,getRequireItem(baseRequire.getRequire2Id(),baseRequire.getRequire2Amount()));
         }
 
-        gui.setItem(22,getEnterIcon(base.isTown()));
+        gui.setItem(22,getEnterIcon(baseLocation.isTown()));
 
         return gui;
     }
@@ -135,22 +136,5 @@ public class BaseUpgradeGUI {
 
         item.setItemMeta(meta);
         return item;
-    }
-
-    private static int getSlot(int number){
-        switch (number){
-            case 0:
-                return 11;
-            case 1:
-                return 15;
-            case 2:
-                return 13;
-            case 3:
-                return 12;
-            case 4:
-                return 14;
-            default:
-                return -1;
-        }
     }
 }

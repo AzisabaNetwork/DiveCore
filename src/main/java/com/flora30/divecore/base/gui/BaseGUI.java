@@ -1,5 +1,7 @@
 package com.flora30.divecore.base.gui;
 
+import com.flora30.data.Base;
+import com.flora30.data.BaseObject;
 import com.flora30.diveapi.tools.GuiItem;
 import com.flora30.divecore.base.BaseMain;
 import org.bukkit.Bukkit;
@@ -21,7 +23,7 @@ public class BaseGUI {
     }
 
     private static Inventory create(int baseId) {
-        Base base = BaseMain.baseMap.get(baseId);
+        Base base = BaseObject.INSTANCE.getBaseMap().get(baseId);
         Inventory gui = Bukkit.createInventory(null,27,"拠点");
         for (int i = 0; i < 27; i++){
             gui.setItem(i, GuiItem.getItem(Material.GRAY_STAINED_GLASS_PANE));

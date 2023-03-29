@@ -1,5 +1,7 @@
 package com.flora30.divecore.base.gui.trigger;
 
+import com.flora30.data.Base;
+import com.flora30.data.BaseObject;
 import com.flora30.diveapi.plugins.RegionAPI;
 import com.flora30.diveapi.tools.DMythicUtil;
 import com.flora30.diveapi.tools.PlayerItem;
@@ -7,6 +9,7 @@ import com.flora30.divecore.base.BaseMain;
 import com.flora30.divecore.base.gui.BaseGUI;
 import com.flora30.divecore.tools.SoundUtil;
 import com.flora30.divecore.tools.type.DiveSound;
+import data.*;
 import org.bukkit.*;
 import org.bukkit.entity.Entity;
 import org.bukkit.entity.Player;
@@ -57,44 +60,47 @@ public class BaseUpgradeGUITrigger {
         if (baseId == -1){
             return;
         }
-        Base base = BaseMain.baseMap.get(baseId);
-        BaseRequire require = BaseMain.baseDataMap.get(RegionAPI.getLayerName(location)).getLevelMap().get(nextLevel);
+
+
+        Base base = BaseObject.INSTANCE.getBaseMap().get(baseId);
+        BaseLocation baseLocation = BaseDataObject.INSTANCE.getBaseLocationMap().get(baseId);
+            // 次のレベルの必要素材を取得
+        BaseLayer baseLayer = BaseDataObject.INSTANCE.getBaseLayerMap().get(LayerObject.INSTANCE.getLayerName(location));
+        BaseRequire baseRequire = baseLayer.getLevelMap().get(nextLevel);
 
         //クリック音
         SoundUtil.playSound(player, DiveSound.GuiClick,1.0);
 
-        if (itemCheck(player, require)){
-            for (int itemId : require.getRequireMap().keySet()) {
-                int amount = require.getRequireMap().get(itemId);
-                PlayerItem.takeItem(player,itemId,amount);
-            }
+        if (itemCheck(player, baseRequire)){
+            PlayerItem.takeItem(player,baseRequire.getRequire1Id(),baseRequire.getRequire1Amount());
+            PlayerItem.takeItem(player,baseRequire.getRequire2Id(),baseRequire.getRequire2Amount());
 
             base.setLevel(nextLevel);
-            if (base.model != null) {
-                Entity beforeModel = Bukkit.getEntity(base.model);
+            if (base.getModel() != null) {
+                Entity beforeModel = Bukkit.getEntity(base.getModel());
                 if(beforeModel != null) beforeModel.remove();
-                base.model = null;
+                base.setModel(null);
             }
             switch (nextLevel) {
                 case 1 -> {
                     base.setRemain(base.getRemain() + 600);
-                    Entity mob = DMythicUtil.spawnMob("BonFire1", base.getLocation().clone().add(0.5,0,0.5));
-                    base.model = mob.getUniqueId();
+                    Entity mob = DMythicUtil.spawnMob("BonFire1", baseLocation.getLocation().clone().add(0.5,0,0.5));
+                    base.setModel(mob.getUniqueId());
                 }
                 case 2 -> {
                     base.setRemain(base.getRemain() + 1200);
-                    Entity mob = DMythicUtil.spawnMob("BonFire2", base.getLocation().clone().add(0.5,0,0.5));
-                    base.model = mob.getUniqueId();
+                    Entity mob = DMythicUtil.spawnMob("BonFire2", baseLocation.getLocation().clone().add(0.5,0,0.5));
+                    base.setModel(mob.getUniqueId());
                 }
                 case 3 -> {
                     base.setRemain(base.getRemain() + 1200);
-                    Entity mob = DMythicUtil.spawnMob("BonFire3", base.getLocation().clone().add(0.5,0,0.5));
-                    base.model = mob.getUniqueId();
+                    Entity mob = DMythicUtil.spawnMob("BonFire3", baseLocation.getLocation().clone().add(0.5,0,0.5));
+                    base.setModel(mob.getUniqueId());
                 }
                 case 4 -> {
                     base.setRemain(base.getRemain() + 2400);
-                    Entity mob = DMythicUtil.spawnMob("BonFire4", base.getLocation().clone().add(0.5,0,0.5));
-                    base.model = mob.getUniqueId();
+                    Entity mob = DMythicUtil.spawnMob("BonFire4", baseLocation.getLocation().clone().add(0.5,0,0.5));
+                    base.setModel(mob.getUniqueId());
                 }
             }
             player.sendMessage("拠点レベルが"+nextLevel+"に上昇しました！");
@@ -137,7 +143,7 @@ public class BaseUpgradeGUITrigger {
             int locId = baseItem.getItemMeta().getCustomModelData();
             int baseId = BaseMain.getBaseId(BaseMain.baseUpgradeInstantList.get(locId));
 
-            Base base = BaseMain.baseMap.get(baseId);
+            Base base = BaseObject.INSTANCE.getBaseMap().get(baseId);
 
             //Bukkit.getLogger().info("baseId = "+baseId);
 
@@ -148,16 +154,9 @@ public class BaseUpgradeGUITrigger {
     }
 
 
-
     private static boolean itemCheck(Player player, BaseRequire require){
-        for (int itemId : require.getRequireMap().keySet()){
-            int amount = require.getRequireMap().get(itemId);
-
-            if (PlayerItem.countItem(player,itemId,true) < amount){
-                return false;
-            }
-        }
-
+        if (PlayerItem.countItem(player,require.getRequire1Id(),true) < require.getRequire1Amount()) return false;
+        if (PlayerItem.countItem(player,require.getRequire2Id(),true) < require.getRequire2Amount()) return false;
         return true;
     }
 }
