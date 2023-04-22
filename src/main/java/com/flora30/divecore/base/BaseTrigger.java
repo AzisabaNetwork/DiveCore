@@ -1,5 +1,6 @@
 package com.flora30.divecore.base;
 
+import com.flora30.ItemLoadEvent;
 import com.flora30.data.Base;
 import com.flora30.data.BaseObject;
 import com.flora30.diveapi.DiveAPI;
@@ -18,6 +19,17 @@ import org.bukkit.event.block.BlockPlaceEvent;
 import org.bukkit.event.player.PlayerInteractEvent;
 
 public class BaseTrigger {
+
+    // Cook関連のロード
+    public static void onItemLoad(ItemLoadEvent e) {
+        if (e.getSection().isSet("Cook")) {
+            int cookTo = e.getSection().getInteger("Cook",0);
+            if (cookTo != 0) {
+                CookMain.cookMap.put(id,cookTo);
+            }
+        }
+    }
+
 
     public static void onLayerLoad(LayerLoadEvent e) {
         BaseConfig.loadBaseData(e.getKey(), e.getSection());
