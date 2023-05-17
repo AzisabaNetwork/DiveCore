@@ -27,6 +27,10 @@ public final class DiveCore extends JavaPlugin {
     private final Listeners listeners = new Listeners();
     public static boolean disabling = false;
 
+    // 毎tick更新される現在時間（ms単位、ラグ検出用）
+    public static long lagTime = 0;
+
+
     @Override
     public void onEnable() {
         // Plugin startup logic
@@ -98,6 +102,7 @@ public final class DiveCore extends JavaPlugin {
             count.getAndIncrement();
             onTimer();
             //ここでやりたいことを入れる
+            lagTime = System.currentTimeMillis();
             listeners.onTimer();
         }, time);
     }
