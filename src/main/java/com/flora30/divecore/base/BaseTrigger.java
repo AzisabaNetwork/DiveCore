@@ -1,12 +1,12 @@
 package com.flora30.divecore.base;
 
-import com.flora30.ItemLoadEvent;
-import com.flora30.data.Base;
-import com.flora30.data.BaseObject;
-import com.flora30.diveapi.DiveAPI;
-import com.flora30.diveapi.event.LayerLoadEvent;
-import data.BaseDataObject;
-import data.BaseLocation;
+import com.flora30.diveapin.DiveAPIN;
+import com.flora30.diveapin.data.Base;
+import com.flora30.diveapin.data.BaseObject;
+import com.flora30.diveapin.event.LayerLoadEvent;
+import com.flora30.divecore.DiveCore;
+import com.flora30.divenew.data.BaseDataObject;
+import com.flora30.divenew.data.BaseLocation;
 import io.lumine.xikage.mythicmobs.MythicMobs;
 import io.lumine.xikage.mythicmobs.api.exceptions.InvalidMobTypeException;
 import org.bukkit.Bukkit;
@@ -19,17 +19,6 @@ import org.bukkit.event.block.BlockPlaceEvent;
 import org.bukkit.event.player.PlayerInteractEvent;
 
 public class BaseTrigger {
-
-    // Cook関連のロード
-    public static void onItemLoad(ItemLoadEvent e) {
-        if (e.getSection().isSet("Cook")) {
-            int cookTo = e.getSection().getInteger("Cook",0);
-            if (cookTo != 0) {
-                CookMain.cookMap.put(id,cookTo);
-            }
-        }
-    }
-
 
     public static void onLayerLoad(LayerLoadEvent e) {
         BaseConfig.loadBaseData(e.getKey(), e.getSection());
@@ -61,7 +50,7 @@ public class BaseTrigger {
     }
 
     public static void onTickBaseGuard(){
-        long lagLimit_ms = DiveAPI.lagTime + 50L;
+        long lagLimit_ms = DiveCore.lagTime + 50L;
 
         for (int id : BaseObject.INSTANCE.getBaseMap().keySet()) {
             Base base = BaseObject.INSTANCE.getBaseMap().get(id);
@@ -82,7 +71,7 @@ public class BaseTrigger {
                 base.setPrepared(true);
             }
             if (base.getLevel() > 0){
-                if (System.currentTimeMillis() > DiveAPI.lagTime + 500L) {
+                if (System.currentTimeMillis() > DiveCore.lagTime + 500L) {
                     Bukkit.getLogger().info("[DiveCore-Base]guard lag skip");
                     return;
                 }

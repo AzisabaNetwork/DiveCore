@@ -1,17 +1,15 @@
 package com.flora30.divecore.base;
 
-import com.flora30.data.Base;
-import com.flora30.data.BaseObject;
-import com.flora30.diveapi.data.PlayerData;
-import com.flora30.diveapi.event.HelpEvent;
-import com.flora30.diveapi.plugins.ItemAPI;
-import com.flora30.diveapi.plugins.RegionAPI;
-import com.flora30.diveapi.tools.HelpType;
+import com.flora30.diveapin.data.Base;
+import com.flora30.diveapin.data.BaseObject;
+import com.flora30.diveapin.data.player.PlayerData;
+import com.flora30.diveapin.data.player.PlayerDataObject;
+import com.flora30.diveapin.event.HelpEvent;
+import com.flora30.diveapin.event.HelpType;
 import com.flora30.divecore.base.gui.BaseGUI;
-import com.flora30.divecore.data.PlayerDataMain;
-import data.BaseDataObject;
-import data.BaseLocation;
-import data.LayerObject;
+import com.flora30.divenew.data.BaseDataObject;
+import com.flora30.divenew.data.BaseLocation;
+import com.flora30.divenew.data.LayerObject;
 import org.bukkit.Bukkit;
 import org.bukkit.Location;
 import org.bukkit.block.data.type.Campfire;
@@ -46,12 +44,12 @@ public class BaseMain {
         // 料理判定
         if (base.getLevel() >= 2) {
             Bukkit.getPluginManager().callEvent(new HelpEvent(player, HelpType.Base_Cook));
-            if (ItemAPI.cook(player, baseLocation.getLocation())) return;
+            if (Cook.cook(player, baseLocation.getLocation())) return;
         }
 
-        PlayerData data = PlayerDataMain.getPlayerData(player.getUniqueId());
-        if (data.coolDownMap.containsKey("Cook")) {
-            int cookCooldown = data.coolDownMap.get("Cook");
+        PlayerData data = PlayerDataObject.INSTANCE.getPlayerDataMap().get(player.getUniqueId());
+        if (data.getCoolDownMap().containsKey("Cook")) {
+            int cookCooldown = data.getCoolDownMap().get("Cook");
             if (cookCooldown != 0) return;
         }
 

@@ -1,8 +1,9 @@
 package com.flora30.divecore.level.gui;
 
-import com.flora30.diveapi.data.player.LevelData;
-import com.flora30.diveapi.tools.GuiItem;
-import com.flora30.diveapi.tools.GuiItemType;
+import com.flora30.diveapin.data.player.LevelData;
+import com.flora30.diveapin.data.player.PlayerDataObject;
+import com.flora30.diveapin.util.GuiItem;
+import com.flora30.diveapin.util.GuiItemType;
 import com.flora30.divecore.data.PlayerDataMain;
 import com.flora30.divecore.level.Point;
 import com.flora30.divecore.level.PointData;
@@ -26,22 +27,22 @@ public class SetPointGUI {
     }
 
     public static Inventory create(UUID id) {
-        LevelData data = PlayerDataMain.getPlayerData(id).levelData;
-        Inventory gui = GuiItem.grayBack(Bukkit.createInventory(null,45, "ステータス強化"));
+        LevelData data = PlayerDataObject.INSTANCE.getPlayerDataMap().get(id).getLevelData();
+        Inventory gui = GuiItem.INSTANCE.grayBack(Bukkit.createInventory(null,45, "ステータス強化"));
 
-        gui.setItem(4,getCurrentPoint(data.rawPoint));
+        gui.setItem(4,getCurrentPoint(data.getRawPoint()));
 
-        gui.setItem(19,getIconAtk(data.pointAtk));
-        gui.setItem(21,getIconVit(data.pointVit));
-        gui.setItem(23,getIconInt(data.pointInt));
-        gui.setItem(25,getIconLuc(data.pointLuc));
+        gui.setItem(19,getIconAtk(data.getPointAtk()));
+        gui.setItem(21,getIconVit(data.getPointVit()));
+        gui.setItem(23,getIconInt(data.getPointInt()));
+        gui.setItem(25,getIconLuc(data.getPointLuc()));
 
-        gui.setItem(28,getIconAtkPlus(data.pointAtk));
-        gui.setItem(30,getIconVitPlus(data.pointVit));
-        gui.setItem(32,getIconIntPlus(data.pointInt));
-        gui.setItem(34,getIconLucPlus(data.pointLuc));
+        gui.setItem(28,getIconAtkPlus(data.getPointAtk()));
+        gui.setItem(30,getIconVitPlus(data.getPointVit()));
+        gui.setItem(32,getIconIntPlus(data.getPointInt()));
+        gui.setItem(34,getIconLucPlus(data.getPointLuc()));
 
-        gui.setItem(44, GuiItem.getReturn());
+        gui.setItem(44, GuiItem.INSTANCE.getReturn());
 
         return gui;
     }
@@ -50,8 +51,8 @@ public class SetPointGUI {
         PointData data = Point.lucApplyMap.get(point);
         if (point == 0) data = new PointData();
 
-        ItemStack item = GuiItem.getItem(GuiItemType.PointLuc);
-        if (point == 0) item = GuiItem.getItem(GuiItemType.PointZero);
+        ItemStack item = GuiItem.INSTANCE.getItem(GuiItemType.PointLuc);
+        if (point == 0) item = GuiItem.INSTANCE.getItem(GuiItemType.PointZero);
         ItemMeta meta = item.getItemMeta();
         assert meta != null;
 
@@ -72,7 +73,7 @@ public class SetPointGUI {
 
     public static ItemStack getIconLucPlus(int point) {
 
-        ItemStack item = GuiItem.getItem(GuiItemType.Plus);
+        ItemStack item = GuiItem.INSTANCE.getItem(GuiItemType.Plus);
         ItemMeta meta = item.getItemMeta();
         assert meta != null;
         List<String> lore = new ArrayList<>();
@@ -104,8 +105,8 @@ public class SetPointGUI {
         PointData data = Point.intApplyMap.get(point);
         if (point == 0) data = new PointData();
 
-        ItemStack item = GuiItem.getItem(GuiItemType.PointInt);
-        if (point == 0) item = GuiItem.getItem(GuiItemType.PointZero);
+        ItemStack item = GuiItem.INSTANCE.getItem(GuiItemType.PointInt);
+        if (point == 0) item = GuiItem.INSTANCE.getItem(GuiItemType.PointZero);
         ItemMeta meta = item.getItemMeta();
         assert meta != null;
 
@@ -126,7 +127,7 @@ public class SetPointGUI {
 
     public static ItemStack getIconIntPlus(int point) {
 
-        ItemStack item = GuiItem.getItem(GuiItemType.Plus);
+        ItemStack item = GuiItem.INSTANCE.getItem(GuiItemType.Plus);
         ItemMeta meta = item.getItemMeta();
         assert meta != null;
         List<String> lore = new ArrayList<>();
@@ -158,8 +159,8 @@ public class SetPointGUI {
         PointData data = Point.vitApplyMap.get(point);
         if (point == 0) data = new PointData();
 
-        ItemStack item = GuiItem.getItem(GuiItemType.PointVit);
-        if (point == 0) item = GuiItem.getItem(GuiItemType.PointZero);
+        ItemStack item = GuiItem.INSTANCE.getItem(GuiItemType.PointVit);
+        if (point == 0) item = GuiItem.INSTANCE.getItem(GuiItemType.PointZero);
         ItemMeta meta = item.getItemMeta();
         assert meta != null;
 
@@ -180,7 +181,7 @@ public class SetPointGUI {
     }
 
     public static ItemStack getIconVitPlus(int point) {
-        ItemStack item = GuiItem.getItem(GuiItemType.Plus);
+        ItemStack item = GuiItem.INSTANCE.getItem(GuiItemType.Plus);
         ItemMeta meta = item.getItemMeta();
         assert meta != null;
         List<String> lore = new ArrayList<>();
@@ -212,8 +213,8 @@ public class SetPointGUI {
         PointData data = Point.atkApplyMap.get(point);
         if (point == 0) data = new PointData();
 
-        ItemStack item = GuiItem.getItem(GuiItemType.PointAtk);
-        if (point == 0) item = GuiItem.getItem(GuiItemType.PointZero);
+        ItemStack item = GuiItem.INSTANCE.getItem(GuiItemType.PointAtk);
+        if (point == 0) item = GuiItem.INSTANCE.getItem(GuiItemType.PointZero);
         ItemMeta meta = item.getItemMeta();
         assert meta != null;
 
@@ -234,7 +235,7 @@ public class SetPointGUI {
     }
 
     public static ItemStack getIconAtkPlus(int point) {
-        ItemStack item = GuiItem.getItem(GuiItemType.Plus);
+        ItemStack item = GuiItem.INSTANCE.getItem(GuiItemType.Plus);
         ItemMeta meta = item.getItemMeta();
         assert meta != null;
         List<String> lore = new ArrayList<>();
@@ -263,7 +264,7 @@ public class SetPointGUI {
     }
 
     public static ItemStack getCurrentPoint(int point){
-        ItemStack item = GuiItem.getItem(GuiItemType.Point);
+        ItemStack item = GuiItem.INSTANCE.getItem(GuiItemType.Point);
         ItemMeta meta = item.getItemMeta();
         assert meta != null;
         meta.setDisplayName(ChatColor.GOLD+"所持ポイント ‣ "+point);

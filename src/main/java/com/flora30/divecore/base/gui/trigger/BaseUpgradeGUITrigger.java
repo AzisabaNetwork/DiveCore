@@ -1,15 +1,14 @@
 package com.flora30.divecore.base.gui.trigger;
 
-import com.flora30.data.Base;
-import com.flora30.data.BaseObject;
-import com.flora30.diveapi.plugins.RegionAPI;
-import com.flora30.diveapi.tools.DMythicUtil;
-import com.flora30.diveapi.tools.PlayerItem;
+import com.flora30.diveapin.data.Base;
+import com.flora30.diveapin.data.BaseObject;
+import com.flora30.diveapin.util.DMythicUtil;
+import com.flora30.diveapin.util.PlayerItem;
 import com.flora30.divecore.base.BaseMain;
 import com.flora30.divecore.base.gui.BaseGUI;
 import com.flora30.divecore.tools.SoundUtil;
 import com.flora30.divecore.tools.type.DiveSound;
-import data.*;
+import com.flora30.divenew.data.*;
 import org.bukkit.*;
 import org.bukkit.entity.Entity;
 import org.bukkit.entity.Player;
@@ -72,8 +71,8 @@ public class BaseUpgradeGUITrigger {
         SoundUtil.playSound(player, DiveSound.GuiClick,1.0);
 
         if (itemCheck(player, baseRequire)){
-            PlayerItem.takeItem(player,baseRequire.getRequire1Id(),baseRequire.getRequire1Amount());
-            PlayerItem.takeItem(player,baseRequire.getRequire2Id(),baseRequire.getRequire2Amount());
+            PlayerItem.INSTANCE.takeItem(player,baseRequire.getRequire1Id(),baseRequire.getRequire1Amount());
+            PlayerItem.INSTANCE.takeItem(player,baseRequire.getRequire2Id(),baseRequire.getRequire2Amount());
 
             base.setLevel(nextLevel);
             if (base.getModel() != null) {
@@ -84,22 +83,26 @@ public class BaseUpgradeGUITrigger {
             switch (nextLevel) {
                 case 1 -> {
                     base.setRemain(base.getRemain() + 600);
-                    Entity mob = DMythicUtil.spawnMob("BonFire1", baseLocation.getLocation().clone().add(0.5,0,0.5));
+                    Entity mob = DMythicUtil.INSTANCE.spawnMob("BonFire1", baseLocation.getLocation().clone().add(0.5,0,0.5));
+                    assert mob != null;
                     base.setModel(mob.getUniqueId());
                 }
                 case 2 -> {
                     base.setRemain(base.getRemain() + 1200);
-                    Entity mob = DMythicUtil.spawnMob("BonFire2", baseLocation.getLocation().clone().add(0.5,0,0.5));
+                    Entity mob = DMythicUtil.INSTANCE.spawnMob("BonFire2", baseLocation.getLocation().clone().add(0.5,0,0.5));
+                    assert mob != null;
                     base.setModel(mob.getUniqueId());
                 }
                 case 3 -> {
                     base.setRemain(base.getRemain() + 1200);
-                    Entity mob = DMythicUtil.spawnMob("BonFire3", baseLocation.getLocation().clone().add(0.5,0,0.5));
+                    Entity mob = DMythicUtil.INSTANCE.spawnMob("BonFire3", baseLocation.getLocation().clone().add(0.5,0,0.5));
+                    assert mob != null;
                     base.setModel(mob.getUniqueId());
                 }
                 case 4 -> {
                     base.setRemain(base.getRemain() + 2400);
-                    Entity mob = DMythicUtil.spawnMob("BonFire4", baseLocation.getLocation().clone().add(0.5,0,0.5));
+                    Entity mob = DMythicUtil.INSTANCE.spawnMob("BonFire4", baseLocation.getLocation().clone().add(0.5,0,0.5));
+                    assert mob != null;
                     base.setModel(mob.getUniqueId());
                 }
             }
@@ -155,8 +158,8 @@ public class BaseUpgradeGUITrigger {
 
 
     private static boolean itemCheck(Player player, BaseRequire require){
-        if (PlayerItem.countItem(player,require.getRequire1Id(),true) < require.getRequire1Amount()) return false;
-        if (PlayerItem.countItem(player,require.getRequire2Id(),true) < require.getRequire2Amount()) return false;
+        if (PlayerItem.INSTANCE.countItem(player,require.getRequire1Id(),true) < require.getRequire1Amount()) return false;
+        if (PlayerItem.INSTANCE.countItem(player,require.getRequire2Id(),true) < require.getRequire2Amount()) return false;
         return true;
     }
 }

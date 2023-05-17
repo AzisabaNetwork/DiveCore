@@ -1,11 +1,12 @@
 package com.flora30.divecore.base;
 
-import com.flora30.DMythicUtil;
-import com.flora30.ItemMain;
-import com.flora30.data.player.PlayerData;
-import com.flora30.data.player.PlayerDataObject;
-import data.item.ItemData;
-import data.item.ItemDataObject;
+import com.flora30.diveapin.ItemMain;
+import com.flora30.diveapin.data.player.PlayerData;
+import com.flora30.diveapin.data.player.PlayerDataObject;
+import com.flora30.diveapin.util.DMythicUtil;
+import com.flora30.diveapin.util.PlayerItem;
+import com.flora30.divenew.data.item.ItemData;
+import com.flora30.divenew.data.item.ItemDataObject;
 import org.bukkit.Location;
 import org.bukkit.Particle;
 import org.bukkit.Sound;
@@ -32,16 +33,17 @@ public class Cook {
         // 焼けるものIDを取得
         ItemStack item = player.getInventory().getItemInMainHand();
         if (item.getItemMeta() == null) return false;
-        int cookId = ItemDataObject.INSTANCE.getItemId(item);
+        int cookId = ItemMain.INSTANCE.getItemId(item);
         ItemData itemData = ItemDataObject.INSTANCE.getItemDataMap().get(cookId);
 
         // 焼いた後を取得
         if (itemData.getCookData() == null) return false;
         ItemStack cookedItem = ItemMain.INSTANCE.getItem(itemData.getCookData().getDishId());
+        if (cookedItem == null) return false;
 
         // 交換
         item.setAmount(item.getAmount() - 1);
-        PlayerItem.giveItem(player,cookedItem);
+        PlayerItem.INSTANCE.giveItem(player,cookedItem);
         data.getCoolDownMap().put(coolDownID, 10);
 
         // 演出

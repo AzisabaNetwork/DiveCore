@@ -1,9 +1,8 @@
 package com.flora30.divecore.base.gui;
 
-import com.flora30.data.Base;
-import com.flora30.data.BaseObject;
-import com.flora30.diveapi.tools.GuiItem;
-import com.flora30.divecore.base.BaseMain;
+import com.flora30.diveapin.data.Base;
+import com.flora30.diveapin.data.BaseObject;
+import com.flora30.diveapin.util.GuiItem;
 import org.bukkit.Bukkit;
 import org.bukkit.ChatColor;
 import org.bukkit.Material;
@@ -26,7 +25,7 @@ public class BaseGUI {
         Base base = BaseObject.INSTANCE.getBaseMap().get(baseId);
         Inventory gui = Bukkit.createInventory(null,27,"拠点");
         for (int i = 0; i < 27; i++){
-            gui.setItem(i, GuiItem.getItem(Material.GRAY_STAINED_GLASS_PANE));
+            gui.setItem(i, GuiItem.INSTANCE.getItem(Material.GRAY_STAINED_GLASS_PANE));
         }
 
         gui.setItem(10, getGuardIcon(base.getLevel()));

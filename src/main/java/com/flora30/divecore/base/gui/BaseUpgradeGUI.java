@@ -1,13 +1,11 @@
 package com.flora30.divecore.base.gui;
 
-import com.flora30.data.Base;
-import com.flora30.data.BaseObject;
-import com.flora30.diveapi.plugins.ItemAPI;
-import com.flora30.diveapi.plugins.RegionAPI;
-import com.flora30.diveapi.tools.GuiItem;
-import com.flora30.divecore.base.BaseData;
+import com.flora30.diveapin.ItemMain;
+import com.flora30.diveapin.data.Base;
+import com.flora30.diveapin.data.BaseObject;
+import com.flora30.diveapin.util.GuiItem;
 import com.flora30.divecore.base.BaseMain;
-import data.*;
+import com.flora30.divenew.data.*;
 import org.bukkit.Bukkit;
 import org.bukkit.ChatColor;
 import org.bukkit.Location;
@@ -37,7 +35,7 @@ public class BaseUpgradeGUI {
 
         Inventory gui = Bukkit.createInventory(null,27,"拠点強化");
         for (int i = 0; i < 27; i++){
-            gui.setItem(i, GuiItem.getItem(Material.GRAY_STAINED_GLASS_PANE));
+            gui.setItem(i, GuiItem.INSTANCE.getItem(Material.GRAY_STAINED_GLASS_PANE));
         }
 
         gui.setItem(4,getNewBaseIcon(baseLocation.getLocation(),base.getLevel() + 1));
@@ -111,7 +109,8 @@ public class BaseUpgradeGUI {
     }
 
     private static ItemStack getRequireItem(int id, int amount){
-        ItemStack item = ItemAPI.getItem(id);
+        ItemStack item = ItemMain.INSTANCE.getItem(id);
+        if (item == null) return null;
         item.setAmount(amount);
         return item;
     }

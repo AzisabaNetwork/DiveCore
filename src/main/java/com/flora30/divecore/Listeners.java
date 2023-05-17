@@ -1,8 +1,6 @@
 package com.flora30.divecore;
 
-import com.flora30.diveapi.event.HelpEvent;
-import com.flora30.diveapi.event.LayerChangeEvent;
-import com.flora30.diveapi.event.LayerLoadEvent;
+import com.flora30.diveapin.event.LayerLoadEvent;
 import com.flora30.divecore.api.event.RegisterSideBarEvent;
 import com.flora30.divecore.base.BaseTrigger;
 import com.flora30.divecore.base.gui.trigger.BaseGUITrigger;

@@ -1,11 +1,10 @@
 package com.flora30.divecore.base.gui.trigger;
 
-import com.flora30.data.Base;
-import com.flora30.data.BaseObject;
-import com.flora30.diveapi.plugins.ItemAPI;
-import com.flora30.divecore.base.BaseMain;
+import com.flora30.diveapin.data.Base;
+import com.flora30.diveapin.data.BaseObject;
 import com.flora30.divecore.base.gui.BaseGUI;
 import com.flora30.divecore.base.gui.BaseUpgradeGUI;
+import com.flora30.divecore.base.gui.EnderChestGUI;
 import com.flora30.divecore.level.gui.SetPointGUI;
 import com.flora30.divecore.tools.SoundUtil;
 import com.flora30.divecore.tools.type.DiveSound;
@@ -46,7 +45,7 @@ public class BaseGUITrigger {
             }
             case ENDER_CHEST -> {
                 SoundUtil.playSound(player, DiveSound.GuiClick,1.0);
-                ItemAPI.openEnderGUI(player);
+                player.openInventory(EnderChestGUI.getGui(player));
             }
             case CAMPFIRE -> {
                 Base base = BaseObject.INSTANCE.getBaseMap().get(baseId);

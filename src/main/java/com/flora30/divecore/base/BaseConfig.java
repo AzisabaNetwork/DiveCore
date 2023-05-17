@@ -1,13 +1,13 @@
 package com.flora30.divecore.base;
 
-import com.flora30.data.Base;
-import com.flora30.data.BaseObject;
+import com.flora30.diveapin.data.Base;
+import com.flora30.diveapin.data.BaseObject;
 import com.flora30.divecore.DiveCore;
 import com.flora30.divecore.tools.Config;
-import data.BaseDataObject;
-import data.BaseLayer;
-import data.BaseLocation;
-import data.BaseRequire;
+import com.flora30.divenew.data.BaseDataObject;
+import com.flora30.divenew.data.BaseLayer;
+import com.flora30.divenew.data.BaseLocation;
+import com.flora30.divenew.data.BaseRequire;
 import org.bukkit.Bukkit;
 import org.bukkit.Location;
 import org.bukkit.Material;
