@@ -1,15 +1,14 @@
 package com.flora30.divecore.data;
 
-import com.flora30.diveapi.data.PlayerData;
-import com.flora30.diveapi.event.FirstJoinEvent;
-import com.flora30.diveapi.plugins.CoreAPI;
+import com.flora30.diveapin.data.player.PlayerData;
+import com.flora30.diveapin.data.player.PlayerDataObject;
+import com.flora30.diveapin.event.FirstJoinEvent;
 import com.flora30.divecore.DiveCore;
 import org.bukkit.Bukkit;
 import org.bukkit.GameMode;
 import org.bukkit.OfflinePlayer;
 import org.bukkit.entity.Player;
 import org.bukkit.event.player.PlayerJoinEvent;
-import org.bukkit.event.player.PlayerLoginEvent;
 import org.bukkit.event.player.PlayerQuitEvent;
 
 import java.util.*;
@@ -18,7 +17,7 @@ public class DataTrigger {
     public static boolean logMode = false;
 
     public static void onJoin(PlayerJoinEvent e){
-        PlayerDataMain.putPlayerID(e.getPlayer().getDisplayName(),e.getPlayer().getUniqueId());
+        PlayerDataObject.INSTANCE.getPlayerIdMap().put(e.getPlayer().getDisplayName(),e.getPlayer().getUniqueId());
         DiveCore.plugin.delayedTask(1, () -> {
             PlayerDataConfig ls = new PlayerDataConfig();
             ls.load(e.getPlayer().getUniqueId());
@@ -31,13 +30,14 @@ public class DataTrigger {
     }
 
     private static void checkFirstJoin(Player player) {
-        PlayerData data = PlayerDataMain.getPlayerData(player.getUniqueId());
-        if (data != null && PlayerDataMain.loadedPlayerSet.contains(player.getUniqueId())) {
-            if (data.isFirstJoin) {
+        PlayerData data = PlayerDataObject.INSTANCE.getPlayerDataMap().get(player.getUniqueId());
+
+        if (data != null && PlayerDataObject.INSTANCE.getLoadedPlayerSet().contains(player.getUniqueId())) {
+            if (data.isFirstJoin()) {
                 FirstJoinEvent event = new FirstJoinEvent(player);
                 Bukkit.getLogger().info("FirstJoinEvent called");
                 Bukkit.getPluginManager().callEvent(event);
-                data.isFirstJoin = false;
+                data.setFirstJoin(false);
             }
             else {
                 Bukkit.getLogger().info("not first join");
@@ -49,7 +49,7 @@ public class DataTrigger {
     }
 
     private static void resetGameMode(UUID id){
-        if (CoreAPI.adminSet.contains(id)){
+        if (PlayerDataObject.INSTANCE.getAdminSet().contains(id)){
             return;
         }
 
@@ -80,7 +80,7 @@ public class DataTrigger {
      */
 
     public static void onCommand(String command, String command2){
-        Set<UUID> adminSet = CoreAPI.adminSet;
+        Set<UUID> adminSet = PlayerDataObject.INSTANCE.getAdminSet();
         //list分岐
         if (command.equals("list")){
             Bukkit.getLogger().info("------list------");
@@ -97,7 +97,7 @@ public class DataTrigger {
         }
 
 
-        UUID id = PlayerDataMain.getPlayerID(command2);
+        UUID id = PlayerDataObject.INSTANCE.getPlayerIdMap().get(command2);
         if (id == null){
             Bukkit.getLogger().info("[DiveCore-Admin]名前が登録されていません");
             return;

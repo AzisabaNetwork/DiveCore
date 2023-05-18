@@ -1,12 +1,11 @@
 package com.flora30.divecore.data;
 
-import com.flora30.diveapi.data.ItemData;
-import com.flora30.diveapi.plugins.ItemAPI;
-import com.flora30.diveapi.tools.ItemType;
-import com.flora30.diveapi.tools.PlayerItem;
+import com.flora30.diveapin.ItemMain;
+import com.flora30.diveapin.util.PlayerItem;
 import com.flora30.divecore.tools.StringUtil;
-import com.flora30.divedb.DiveDBAPI;
-import org.bukkit.Bukkit;
+import com.flora30.divenew.data.item.ItemData;
+import com.flora30.divenew.data.item.ItemDataObject;
+import com.flora30.divenew.data.item.ItemType;
 import org.bukkit.Location;
 import org.bukkit.entity.Player;
 import org.bukkit.inventory.Inventory;
@@ -85,21 +84,24 @@ public class PlayerLog {
             addition1 = "null";
         }
         else{
-            itemId = ItemAPI.getItemID(item);
+            itemId = ItemMain.INSTANCE.getItemId(item);
             amount = item.getAmount();
 
             //SaveItemEvent event = new SaveItemEvent(item);
             //Bukkit.getPluginManager().callEvent(event);
-            ItemData data = ItemAPI.getItemData(itemId);
+
+
+            ItemData data = ItemDataObject.INSTANCE.getItemDataMap().get(itemId);
+
             if (data == null) {
                 addition1 = "null";
             }
             // 遺物価値
-            else if (data.artifactData != null) {
-                addition1 = String.valueOf(PlayerItem.getInt(item,"artifactValue"));
+            else if (data.getArtifactData() != null) {
+                addition1 = String.valueOf(PlayerItem.INSTANCE.getInt(item,"artifactValue"));
             }
             // 耐久値（防具）
-            else if (data.type == ItemType.Armor || data.gatherData != null) {
+            else if (data.getType() == ItemType.Armor || data.getToolData() != null) {
                 //Bukkit.getLogger().info("Armor found");
                 Damageable damageable = (Damageable) item.getItemMeta();
                 if (damageable != null) {

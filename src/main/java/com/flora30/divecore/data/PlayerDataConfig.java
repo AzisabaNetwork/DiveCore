@@ -1,11 +1,6 @@
 package com.flora30.divecore.data;
 
-import com.flora30.diveapi.data.PlayerData;
-import com.flora30.diveapi.data.player.LayerData;
-import com.flora30.diveapi.data.player.LevelData;
-import com.flora30.diveapi.data.player.NpcData;
-import com.flora30.diveapi.plugins.CoreAPI;
-import com.flora30.diveapi.plugins.RegionAPI;
+import com.flora30.diveapin.data.player.*;
 import com.flora30.divecore.DiveCore;
 import com.flora30.divecore.display.SideBar;
 import com.flora30.divecore.level.LevelMain;
@@ -34,7 +29,7 @@ public class PlayerDataConfig {
             UUID id;
             try{
                 id = UUID.fromString(str);
-                CoreAPI.adminSet.add(id);
+                PlayerDataObject.INSTANCE.getAdminSet().add(id);
             } catch (IllegalArgumentException e){
                 Bukkit.getLogger().info("[DiveCore-Data]admin : "+str+" がIDに変換できません");
             }
@@ -51,7 +46,7 @@ public class PlayerDataConfig {
                     continue;
                 }
                 id = UUID.fromString(idStr);
-                PlayerDataMain.putPlayerID(str,id);
+                PlayerDataObject.INSTANCE.getPlayerIdMap().put(str,id);
             } catch (IllegalArgumentException e){
                 Bukkit.getLogger().info("[DiveCore-Data]"+str+" がIDに変換できません");
             }
@@ -60,21 +55,21 @@ public class PlayerDataConfig {
 
         for(Player player : Bukkit.getServer().getOnlinePlayers()){
             load(player.getUniqueId());
-
             initialPlayPrepare(player);
         }
     }
+
+    // プレイヤーデータ読み込み完了後の準備
     public void initialPlayPrepare(Player player){
         DiveCore.plugin.asyncTask(() -> {
-            PlayerData data = PlayerDataMain.getPlayerData(player.getUniqueId());
+            PlayerData data = PlayerDataObject.INSTANCE.getPlayerDataMap().get(player.getUniqueId());
             if(data == null){
                 initialPlayPrepare(player);
                 return;
             }
             LevelMain.setMaxHpSt(player);
-            RegionAPI.layerCheck(player);
-            data.currentST = data.maxST;
-            data.food = 10;
+            data.setCurrentST(data.getMaxST());
+            data.setFood(10);
         });
         player.setGameMode(GameMode.ADVENTURE);
     }
@@ -98,58 +93,56 @@ public class PlayerDataConfig {
             DiveCore.plugin.delayedTask(1, () -> load(uuid));
             return;
         }
-        PlayerData data = new PlayerData();
-        NpcData npcData = data.npcData;
-        LayerData layerData = data.layerData;
-        LevelData levelData = data.levelData;
-
 
         String table = "player_data";
         DiveDBAPI.insertSQL(table,uuid);
         DiveDBAPI.insertSQL("loots",uuid);
 
+        PlayerData data = new PlayerData(
+                new LevelData(
+                        Integer.parseInt(DiveDBAPI.loadSQL(table,uuid,"WhistleExp","0")),
+                        Integer.parseInt(DiveDBAPI.loadSQL(table,uuid,"WhistleRank","1")),
+                        Integer.parseInt(DiveDBAPI.loadSQL(table,uuid,"Exp","0")),
+                        Integer.parseInt(DiveDBAPI.loadSQL(table,uuid,"Level","1")),
+                        Integer.parseInt(DiveDBAPI.loadSQL(table,uuid,"RawPoint","0")),
+                        Integer.parseInt(DiveDBAPI.loadSQL(table,uuid,"Luc","0")),
+                        Integer.parseInt(DiveDBAPI.loadSQL(table,uuid,"IntP","0")),
+                        Integer.parseInt(DiveDBAPI.loadSQL(table,uuid,"Vit","0")),
+                        Integer.parseInt(DiveDBAPI.loadSQL(table,uuid,"Atk","0"))
+                ),
+                new NpcData(
+                        Integer.parseInt(DiveDBAPI.loadSQL(table,uuid,"TalkDelay","20")),
+                        Integer.parseInt(DiveDBAPI.loadSQL(table,uuid,"StoryMissionId","-1")),
+                        Integer.parseInt(DiveDBAPI.loadSQL(table,uuid,"MobMissionId","-1")),
+                        Integer.parseInt(DiveDBAPI.loadSQL(table,uuid,"ItemMissionId","-1")),
+                        loadIntegerMap(DiveDBAPI.loadSQL(table,uuid,"TalkProgress","",false)),
+                        false,
+                        false
+                ),
+                new LayerData(
+                        Integer.parseInt(DiveDBAPI.loadSQL(table,uuid,"StorySpeed","40")),
+                        Double.parseDouble(DiveDBAPI.loadSQL(table,uuid,"Curse","0")),
+                        DiveDBAPI.loadSQL(table,uuid,"LootLayer","no"),
+                        loadLootMap(uuid),
+                        loadStringSet(DiveDBAPI.loadSQL(table,uuid,"VisitedLayers","",false)),
+                        DiveDBAPI.loadSQL(table,uuid,"LootLayer","no"),
+                        0
+                ),
+                loadIntegerSet(DiveDBAPI.loadSQL(table,uuid,"Helps","",false)),
+                loadIntegerSet(DiveDBAPI.loadSQL(table,uuid,"FoundRecipes","",false)),
+                loadIntegerSet(DiveDBAPI.loadSQL(table,uuid,"CompletedRecipes","",false)),
+                Integer.parseInt(DiveDBAPI.loadSQL(table,uuid,"IsFirstJoin","1")) == 1,
+                Integer.parseInt(DiveDBAPI.loadSQL(table,uuid,"Money","0"))
+        );
 
-        levelData.exp = Integer.parseInt(DiveDBAPI.loadSQL(table,uuid,"Exp","0"));
-        levelData.level = Integer.parseInt(DiveDBAPI.loadSQL(table,uuid,"Level","1"));
-        levelData.whistleExp = Integer.parseInt(DiveDBAPI.loadSQL(table,uuid,"WhistleExp","0"));
-        levelData.whistleRank = Integer.parseInt(DiveDBAPI.loadSQL(table,uuid,"WhistleRank","1"));
-        levelData.rawPoint = Integer.parseInt(DiveDBAPI.loadSQL(table,uuid,"RawPoint","0"));
-        levelData.pointLuc = Integer.parseInt(DiveDBAPI.loadSQL(table,uuid,"Luc","0"));
-        levelData.pointInt = Integer.parseInt(DiveDBAPI.loadSQL(table,uuid,"IntP","0"));
-        levelData.pointVit = Integer.parseInt(DiveDBAPI.loadSQL(table,uuid,"Vit","0"));
-        levelData.pointAtk = Integer.parseInt(DiveDBAPI.loadSQL(table,uuid,"Atk","0"));
-
-        layerData.storySpeed = Integer.parseInt(DiveDBAPI.loadSQL(table,uuid,"StorySpeed","40"));
-        layerData.curse = Double.parseDouble(DiveDBAPI.loadSQL(table,uuid,"Curse","0"));
-        layerData.lootLayer = DiveDBAPI.loadSQL(table,uuid,"LootLayer","no");
-        layerData.layer = layerData.lootLayer;
-
-        npcData.storyMissionId = Integer.parseInt(DiveDBAPI.loadSQL(table,uuid,"StoryMissionId","-1"));
-        npcData.mobMissionId = Integer.parseInt(DiveDBAPI.loadSQL(table,uuid,"MobMissionId","-1"));
-        npcData.itemMissionId = Integer.parseInt(DiveDBAPI.loadSQL(table,uuid,"ItemMissionId","-1"));
-        npcData.talkDelay = Integer.parseInt(DiveDBAPI.loadSQL(table,uuid,"TalkDelay","20"));
-
-        data.fuel = Integer.parseInt(DiveDBAPI.loadSQL(table,uuid,"Fuel","0"));
-        data.baseId = Integer.parseInt(DiveDBAPI.loadSQL(table,uuid,"BaseId","-1"));
-        data.money = Integer.parseInt(DiveDBAPI.loadSQL(table,uuid,"Money","0"));
-        data.isFirstJoin = Integer.parseInt(DiveDBAPI.loadSQL(table,uuid,"IsFirstJoin","1")) == 1;
-        if (data.isFirstJoin) {
+        if (data.isFirstJoin()) {
             // 本来はPlayerConfigでやること、タイミングをFirstJoinイベントの前にするためにここ
             player.getInventory().clear();
         }
         Bukkit.getLogger().info("FirstJoin -> "+DiveDBAPI.loadSQL(table,uuid,"IsFirstJoin","true"));
 
-        //map・set系はここ
-        npcData.talkProgressMap = loadIntegerMap(DiveDBAPI.loadSQL(table,uuid,"TalkProgress","",false));
-        loadLootMap(uuid,data);
-        layerData.visitedLayers = loadStringSet(DiveDBAPI.loadSQL(table,uuid,"VisitedLayers","",false));
-        data.helpIdSet = loadIntegerSet(DiveDBAPI.loadSQL(table,uuid,"Helps","",false));
-        data.foundRecipeSet = loadIntegerSet(DiveDBAPI.loadSQL(table,uuid,"FoundRecipes","",false));
-        data.completedRecipeSet = loadIntegerSet(DiveDBAPI.loadSQL(table,uuid,"CompletedRecipes","",false));
-
-        data.food = Integer.parseInt(DiveDBAPI.loadSQL("player",uuid,"Food","10"));
-        data.sideBarId = SideBar.getUniqueSideBarID();
-        PlayerDataMain.setPlayerData(uuid,data);
+        data.setFood(Integer.parseInt(DiveDBAPI.loadSQL("player",uuid,"Food","10")));
+        PlayerDataObject.INSTANCE.getPlayerDataMap().put(uuid,data);
 
         // 処理時間を計測する
         long lastTime = System.currentTimeMillis();
@@ -157,8 +150,8 @@ public class PlayerDataConfig {
         Bukkit.getLogger().info("[DiveCore-Data]プレイヤー"+ player.getDisplayName()+"のデータをロードしました（"+taskTime+"ms）");
     }
 
-    private Map<Integer,Integer> loadIntegerMap(String from) {
-        Map<Integer,Integer> map = new HashMap<>();
+    private HashMap<Integer,Integer> loadIntegerMap(String from) {
+        HashMap<Integer,Integer> map = new HashMap<>();
         if (from.equals("no")) {
             return map;
         }
@@ -178,8 +171,8 @@ public class PlayerDataConfig {
         return map;
     }
 
-    private Set<Integer> loadIntegerSet(String from) {
-        Set<Integer> set = new HashSet<>();
+    private HashSet<Integer> loadIntegerSet(String from) {
+        HashSet<Integer> set = new HashSet<>();
         if (from.equals("no")) {
             return set;
         }
@@ -195,8 +188,8 @@ public class PlayerDataConfig {
         return set;
     }
 
-    private Set<String> loadStringSet(String from) {
-        Set<String> set = new HashSet<>();
+    private HashSet<String> loadStringSet(String from) {
+        HashSet<String> set = new HashSet<>();
         if (from.equals("no")) {
             return set;
         }
@@ -204,14 +197,16 @@ public class PlayerDataConfig {
         return set;
     }
 
-    private void loadLootMap(UUID uuid, PlayerData data) {
+    private HashMap<Integer, Integer> loadLootMap(UUID uuid) {
+        HashMap<Integer,Integer> map = new HashMap<>();
         String[] keys = {"Loots_1","Loots_2","Loots_3"};
         for (int lv = 1; lv <= 3; lv++) {
             Set<Integer> set = loadIntegerSet(DiveDBAPI.loadSQL("loots",uuid,keys[lv - 1],"",false));
             for (int id : set) {
-                data.layerData.lootMap.put(id,lv);
+                map.put(id,lv);
             }
         }
+        return map;
     }
 
 
@@ -219,14 +214,14 @@ public class PlayerDataConfig {
         YamlConfiguration config = YamlConfiguration.loadConfiguration(configFile);
         /////////////////////////////////////////////////
         List<String> adminList = new ArrayList<>();
-        for (UUID id : CoreAPI.adminSet){
+        for (UUID id : PlayerDataObject.INSTANCE.getAdminSet()){
             adminList.add(id.toString());
         }
         config.set("admin",adminList);
         /////////////////////////////////////////////////
 
-        for (String name : PlayerDataMain.getPlayerNameSet()){
-            config.set("uuid."+name, PlayerDataMain.getPlayerID(name).toString());
+        for (String name : PlayerDataObject.INSTANCE.getPlayerIdMap().keySet()){
+            config.set("uuid."+name, PlayerDataObject.INSTANCE.getPlayerIdMap().get(name).toString());
         }
         try{
             config.save(configFile);
@@ -236,7 +231,7 @@ public class PlayerDataConfig {
         Bukkit.getLogger().info("[DiveCore-Data]adminリストをセーブしました");
 
 
-        for (UUID id : PlayerDataMain.getAllPlayers()){
+        for (UUID id : PlayerDataObject.INSTANCE.getPlayerDataMap().keySet()){
             save(id);
         }
         Bukkit.getLogger().info("[DiveCore-Data]全プレイヤーのデータを最終セーブしました");
@@ -246,46 +241,44 @@ public class PlayerDataConfig {
         // 処理時間を計測する
         long firstTime = System.currentTimeMillis();
 
-        PlayerData data = PlayerDataMain.getPlayerData(uuid);
-        LevelData levelData = data.levelData;
-        NpcData npcData = data.npcData;
-        LayerData layerData = data.layerData;
+        PlayerData data = PlayerDataObject.INSTANCE.getPlayerDataMap().get(uuid);
+        LevelData levelData = data.getLevelData();
+        NpcData npcData = data.getNpcData();
+        LayerData layerData = data.getLayerData();
 
         String table = "player_data";
 
         DiveDBAPI.insertSQL(table,uuid);
 
-        DiveDBAPI.saveSQL(table,uuid,"Exp",String.valueOf(levelData.exp));
-        DiveDBAPI.saveSQL(table,uuid,"Level",String.valueOf(levelData.level));
-        DiveDBAPI.saveSQL(table,uuid,"WhistleExp",String.valueOf(levelData.whistleExp));
-        DiveDBAPI.saveSQL(table,uuid,"WhistleRank",String.valueOf(levelData.whistleRank));
-        DiveDBAPI.saveSQL(table,uuid,"RawPoint",String.valueOf(levelData.rawPoint));
-        DiveDBAPI.saveSQL(table,uuid,"Luc",String.valueOf(levelData.pointLuc));
-        DiveDBAPI.saveSQL(table,uuid,"IntP",String.valueOf(levelData.pointInt));
-        DiveDBAPI.saveSQL(table,uuid,"Vit",String.valueOf(levelData.pointVit));
-        DiveDBAPI.saveSQL(table,uuid,"Atk",String.valueOf(levelData.pointAtk));
+        DiveDBAPI.saveSQL(table,uuid,"Exp",String.valueOf(levelData.getExp()));
+        DiveDBAPI.saveSQL(table,uuid,"Level",String.valueOf(levelData.getLevel()));
+        DiveDBAPI.saveSQL(table,uuid,"WhistleExp",String.valueOf(levelData.getWhistleExp()));
+        DiveDBAPI.saveSQL(table,uuid,"WhistleRank",String.valueOf(levelData.getWhistleRank()));
+        DiveDBAPI.saveSQL(table,uuid,"RawPoint",String.valueOf(levelData.getRawPoint()));
+        DiveDBAPI.saveSQL(table,uuid,"Luc",String.valueOf(levelData.getPointLuc()));
+        DiveDBAPI.saveSQL(table,uuid,"IntP",String.valueOf(levelData.getPointInt()));
+        DiveDBAPI.saveSQL(table,uuid,"Vit",String.valueOf(levelData.getPointVit()));
+        DiveDBAPI.saveSQL(table,uuid,"Atk",String.valueOf(levelData.getPointAtk()));
 
-        DiveDBAPI.saveSQL(table,uuid,"StorySpeed",String.valueOf(layerData.storySpeed));
-        DiveDBAPI.saveSQL(table,uuid,"Curse",String.valueOf(layerData.curse));
-        DiveDBAPI.saveSQL(table,uuid,"LootLayer","'"+layerData.lootLayer+"'");
+        DiveDBAPI.saveSQL(table,uuid,"StorySpeed",String.valueOf(layerData.getStorySpeed()));
+        DiveDBAPI.saveSQL(table,uuid,"Curse",String.valueOf(layerData.getCurse()));
+        DiveDBAPI.saveSQL(table,uuid,"LootLayer","'"+layerData.getLootLayer()+"'");
 
-        DiveDBAPI.saveSQL(table,uuid,"StoryMissionId",String.valueOf(npcData.storyMissionId));
-        DiveDBAPI.saveSQL(table,uuid,"MobMissionId",String.valueOf(npcData.mobMissionId));
-        DiveDBAPI.saveSQL(table,uuid,"ItemMissionId",String.valueOf(npcData.itemMissionId));
-        DiveDBAPI.saveSQL(table,uuid,"TalkDelay",String.valueOf(npcData.talkDelay));
+        DiveDBAPI.saveSQL(table,uuid,"StoryMissionId",String.valueOf(npcData.getStoryMissionId()));
+        DiveDBAPI.saveSQL(table,uuid,"MobMissionId",String.valueOf(npcData.getMobMissionId()));
+        DiveDBAPI.saveSQL(table,uuid,"ItemMissionId",String.valueOf(npcData.getItemMissionId()));
+        DiveDBAPI.saveSQL(table,uuid,"TalkDelay",String.valueOf(npcData.getTalkDelay()));
 
-        DiveDBAPI.saveSQL(table,uuid,"Fuel",String.valueOf(data.fuel));
-        DiveDBAPI.saveSQL(table,uuid,"BaseId",String.valueOf(data.baseId));
         DiveDBAPI.saveSQL(table,uuid,"IsFirstJoin",String.valueOf(false));
-        DiveDBAPI.saveSQL(table,uuid,"Money",String.valueOf(data.money));
+        DiveDBAPI.saveSQL(table,uuid,"Money",String.valueOf(data.getMoney()));
 
         //map・set系は別関数
         saveLootMap(uuid,layerData);
-        DiveDBAPI.saveSQL(table,uuid,"TalkProgress",convIntegerMap(npcData.talkProgressMap),false);
-        DiveDBAPI.saveSQL(table,uuid,"VisitedLayers",convStringSet(data.layerData.visitedLayers),false);
-        DiveDBAPI.saveSQL(table,uuid,"Helps",convIntSet(data.helpIdSet),false);
-        DiveDBAPI.saveSQL(table,uuid,"FoundRecipes",convIntSet(data.foundRecipeSet),false);
-        DiveDBAPI.saveSQL(table,uuid,"CompletedRecipes",convIntSet(data.completedRecipeSet),false);
+        DiveDBAPI.saveSQL(table,uuid,"TalkProgress",convIntegerMap(npcData.getTalkProgressMap()),false);
+        DiveDBAPI.saveSQL(table,uuid,"VisitedLayers",convStringSet(layerData.getVisitedLayers()),false);
+        DiveDBAPI.saveSQL(table,uuid,"Helps",convIntSet(data.getHelpIdSet()),false);
+        DiveDBAPI.saveSQL(table,uuid,"FoundRecipes",convIntSet(data.getFoundRecipeSet()),false);
+        DiveDBAPI.saveSQL(table,uuid,"CompletedRecipes",convIntSet(data.getCompletedRecipeSet()),false);
 
         OfflinePlayer player = Bukkit.getOfflinePlayer(uuid);
 
@@ -295,7 +288,7 @@ public class PlayerDataConfig {
         Bukkit.getLogger().info("[DiveCore-Data]プレイヤー"+player.getName()+"のデータをセーブしました（"+taskTime+"ms）");
 
         // 次来た時に、ロードが完了するまで他の処理を止める
-        PlayerDataMain.removePlayerData(uuid);
+        PlayerDataObject.INSTANCE.getPlayerDataMap().remove(uuid);
     }
 
     public void saveAsync(UUID uuid){
@@ -303,46 +296,45 @@ public class PlayerDataConfig {
             // 処理時間を計測する
             long firstTime = System.currentTimeMillis();
 
-            PlayerData data = PlayerDataMain.getPlayerData(uuid);
-            LevelData levelData = data.levelData;
-            NpcData npcData = data.npcData;
-            LayerData layerData = data.layerData;
+
+            PlayerData data = PlayerDataObject.INSTANCE.getPlayerDataMap().get(uuid);
+            LevelData levelData = data.getLevelData();
+            NpcData npcData = data.getNpcData();
+            LayerData layerData = data.getLayerData();
 
             String table = "player_data";
 
             DiveDBAPI.insertSQL(table,uuid);
 
-            DiveDBAPI.saveSQL(table,uuid,"Exp",String.valueOf(levelData.exp));
-            DiveDBAPI.saveSQL(table,uuid,"Level",String.valueOf(levelData.level));
-            DiveDBAPI.saveSQL(table,uuid,"WhistleExp",String.valueOf(levelData.whistleExp));
-            DiveDBAPI.saveSQL(table,uuid,"WhistleRank",String.valueOf(levelData.whistleRank));
-            DiveDBAPI.saveSQL(table,uuid,"RawPoint",String.valueOf(levelData.rawPoint));
-            DiveDBAPI.saveSQL(table,uuid,"Luc",String.valueOf(levelData.pointLuc));
-            DiveDBAPI.saveSQL(table,uuid,"IntP",String.valueOf(levelData.pointInt));
-            DiveDBAPI.saveSQL(table,uuid,"Vit",String.valueOf(levelData.pointVit));
-            DiveDBAPI.saveSQL(table,uuid,"Atk",String.valueOf(levelData.pointAtk));
+            DiveDBAPI.saveSQL(table,uuid,"Exp",String.valueOf(levelData.getExp()));
+            DiveDBAPI.saveSQL(table,uuid,"Level",String.valueOf(levelData.getLevel()));
+            DiveDBAPI.saveSQL(table,uuid,"WhistleExp",String.valueOf(levelData.getWhistleExp()));
+            DiveDBAPI.saveSQL(table,uuid,"WhistleRank",String.valueOf(levelData.getWhistleRank()));
+            DiveDBAPI.saveSQL(table,uuid,"RawPoint",String.valueOf(levelData.getRawPoint()));
+            DiveDBAPI.saveSQL(table,uuid,"Luc",String.valueOf(levelData.getPointLuc()));
+            DiveDBAPI.saveSQL(table,uuid,"IntP",String.valueOf(levelData.getPointInt()));
+            DiveDBAPI.saveSQL(table,uuid,"Vit",String.valueOf(levelData.getPointVit()));
+            DiveDBAPI.saveSQL(table,uuid,"Atk",String.valueOf(levelData.getPointAtk()));
 
-            DiveDBAPI.saveSQL(table,uuid,"StorySpeed",String.valueOf(layerData.storySpeed));
-            DiveDBAPI.saveSQL(table,uuid,"Curse",String.valueOf(layerData.curse));
-            DiveDBAPI.saveSQL(table,uuid,"LootLayer","'"+layerData.lootLayer+"'");
+            DiveDBAPI.saveSQL(table,uuid,"StorySpeed",String.valueOf(layerData.getStorySpeed()));
+            DiveDBAPI.saveSQL(table,uuid,"Curse",String.valueOf(layerData.getCurse()));
+            DiveDBAPI.saveSQL(table,uuid,"LootLayer","'"+layerData.getLootLayer()+"'");
 
-            DiveDBAPI.saveSQL(table,uuid,"StoryMissionId",String.valueOf(npcData.storyMissionId));
-            DiveDBAPI.saveSQL(table,uuid,"MobMissionId",String.valueOf(npcData.mobMissionId));
-            DiveDBAPI.saveSQL(table,uuid,"ItemMissionId",String.valueOf(npcData.itemMissionId));
-            DiveDBAPI.saveSQL(table,uuid,"TalkDelay",String.valueOf(npcData.talkDelay));
+            DiveDBAPI.saveSQL(table,uuid,"StoryMissionId",String.valueOf(npcData.getStoryMissionId()));
+            DiveDBAPI.saveSQL(table,uuid,"MobMissionId",String.valueOf(npcData.getMobMissionId()));
+            DiveDBAPI.saveSQL(table,uuid,"ItemMissionId",String.valueOf(npcData.getItemMissionId()));
+            DiveDBAPI.saveSQL(table,uuid,"TalkDelay",String.valueOf(npcData.getTalkDelay()));
 
-            DiveDBAPI.saveSQL(table,uuid,"Fuel",String.valueOf(data.fuel));
-            DiveDBAPI.saveSQL(table,uuid,"BaseId",String.valueOf(data.baseId));
             DiveDBAPI.saveSQL(table,uuid,"IsFirstJoin",String.valueOf(false));
-            DiveDBAPI.saveSQL(table,uuid,"Money",String.valueOf(data.money));
+            DiveDBAPI.saveSQL(table,uuid,"Money",String.valueOf(data.getMoney()));
 
             //map・set系は別関数
             saveLootMap(uuid,layerData);
-            DiveDBAPI.saveSQL(table,uuid,"TalkProgress",convIntegerMap(npcData.talkProgressMap),false);
-            DiveDBAPI.saveSQL(table,uuid,"VisitedLayers",convStringSet(data.layerData.visitedLayers),false);
-            DiveDBAPI.saveSQL(table,uuid,"Helps",convIntSet(data.helpIdSet),false);
-            DiveDBAPI.saveSQL(table,uuid,"FoundRecipes",convIntSet(data.foundRecipeSet),false);
-            DiveDBAPI.saveSQL(table,uuid,"CompletedRecipes",convIntSet(data.completedRecipeSet),false);
+            DiveDBAPI.saveSQL(table,uuid,"TalkProgress",convIntegerMap(npcData.getTalkProgressMap()),false);
+            DiveDBAPI.saveSQL(table,uuid,"VisitedLayers",convStringSet(layerData.getVisitedLayers()),false);
+            DiveDBAPI.saveSQL(table,uuid,"Helps",convIntSet(data.getHelpIdSet()),false);
+            DiveDBAPI.saveSQL(table,uuid,"FoundRecipes",convIntSet(data.getFoundRecipeSet()),false);
+            DiveDBAPI.saveSQL(table,uuid,"CompletedRecipes",convIntSet(data.getCompletedRecipeSet()),false);
 
             OfflinePlayer player = Bukkit.getOfflinePlayer(uuid);
 
@@ -352,7 +344,7 @@ public class PlayerDataConfig {
             Bukkit.getLogger().info("[DiveCore-Data]プレイヤー"+player.getName()+"のデータをセーブしました（"+taskTime+"ms）");
 
             // 次来た時に、ロードが完了するまで他の処理を止める
-            PlayerDataMain.removePlayerData(uuid);
+            PlayerDataObject.INSTANCE.getPlayerDataMap().remove(uuid);
         });
     }
 
@@ -416,8 +408,8 @@ public class PlayerDataConfig {
         Set<Integer> lootSet2 = new HashSet<>();
         Set<Integer> lootSet3 = new HashSet<>();
 
-        for (int id : data.lootMap.keySet()) {
-            switch (data.lootMap.get(id)) {
+        for (int id : data.getLootMap().keySet()) {
+            switch (data.getLootMap().get(id)) {
                 case 1 -> lootSet1.add(id);
                 case 2 -> lootSet2.add(id);
                 case 3 -> lootSet3.add(id);

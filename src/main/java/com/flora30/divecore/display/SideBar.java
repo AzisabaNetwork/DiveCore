@@ -1,6 +1,5 @@
 package com.flora30.divecore.display;
 
-import com.flora30.diveapi.data.PlayerData;
 import com.flora30.divecore.api.event.RegisterSideBarEvent;
 import com.flora30.divecore.data.PlayerDataMain;
 import com.flora30.divecore.display.sidebar.SideOption;
@@ -50,7 +49,6 @@ public class SideBar {
     }
 
     private static void applySideBar(Player player, Scoreboard board){
-        PlayerData data = PlayerDataMain.getPlayerData(player.getUniqueId());
         String top = ChatColor.WHITE +"- "+ ChatColor.GOLD +"Dive RPG"+ ChatColor.WHITE +" -";
 
         Objective objective = board.getObjective("diveBar");
