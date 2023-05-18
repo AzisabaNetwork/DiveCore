@@ -1,11 +1,11 @@
 package com.flora30.divecore.display;
 
-import com.flora30.diveapi.data.ItemData;
-import com.flora30.diveapi.data.PlayerData;
-import com.flora30.diveapi.plugins.ItemAPI;
-import com.flora30.divecore.data.PlayerDataMain;
+import com.flora30.diveapin.ItemMain;
+import com.flora30.diveapin.data.player.PlayerData;
+import com.flora30.diveapin.data.player.PlayerDataObject;
 import com.flora30.divecore.tools.Mathing;
-import org.bukkit.Bukkit;
+import com.flora30.divenew.data.item.ItemData;
+import com.flora30.divenew.data.item.ItemDataObject;
 import org.bukkit.Particle;
 import org.bukkit.attribute.Attribute;
 import org.bukkit.entity.Player;
@@ -16,10 +16,10 @@ import org.bukkit.potion.PotionEffectType;
 public class FoodLevel {
 
     public static void show(Player player){
-        if (PlayerDataMain.getPlayerData(player.getUniqueId()) == null){
+        if (PlayerDataObject.INSTANCE.getPlayerDataMap().get(player.getUniqueId()) == null){
             return;
         }
-        int food = PlayerDataMain.getPlayerData(player.getUniqueId()).food;
+        int food = PlayerDataObject.INSTANCE.getPlayerDataMap().get(player.getUniqueId()).getFood();
         player.setFoodLevel(food);
 
         applySpeed(player);
@@ -37,10 +37,10 @@ public class FoodLevel {
     }
 
     public static void decrease(Player player){
-        PlayerData data = PlayerDataMain.getPlayerData(player.getUniqueId());
-        double current = data.food;
+        PlayerData data = PlayerDataObject.INSTANCE.getPlayerDataMap().get(player.getUniqueId());
+        double current = data.getFood();
         //初期町は減らない
-        if (data.layerData.layer.equals("oldOrth")){
+        if (data.getLayerData().getLayer() != null && data.getLayerData().getLayer().equals("oldOrth")) {
             return;
         }
         //（減少判定）最小30% - 最大100%
@@ -54,28 +54,28 @@ public class FoodLevel {
              */
 
             // 満腹度の消費
-            int decreased = data.food - 1;
+            int decreased = data.getFood() - 1;
             if (decreased < 0){
                 decreased = 0;
             }
-            data.food = (decreased);
+            data.setFood(decreased);
         }
     }
 
     public static void onEat(Player player, ItemStack item){
-        PlayerData data = PlayerDataMain.getPlayerData(player.getUniqueId());
-        ItemData iData = ItemAPI.getItemData(ItemAPI.getItemID(item));
+        PlayerData data = PlayerDataObject.INSTANCE.getPlayerDataMap().get(player.getUniqueId());
+        ItemData iData = ItemDataObject.INSTANCE.getItemDataMap().get(ItemMain.INSTANCE.getItemId(item));
         if (iData == null){
             return;
         }
-        int food = iData.food;
+        int food = iData.getFood();
         //Bukkit.getLogger().info("Food: "+food);
 
-        int ate = data.food + food;
+        int ate = data.getFood() + food;
         if (ate > 20){
             ate = 20;
         }
-        data.food = (ate);
+        data.setFood(ate);
 
 
         // 回復

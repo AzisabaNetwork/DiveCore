@@ -1,8 +1,8 @@
 package com.flora30.divecore.display;
 
 
-import com.flora30.diveapi.data.PlayerData;
-import com.flora30.divecore.data.PlayerDataMain;
+import com.flora30.diveapin.data.player.PlayerData;
+import com.flora30.diveapin.data.player.PlayerDataObject;
 import com.flora30.divecore.display.sidebar.*;
 import com.flora30.divecore.api.event.RegisterSideBarEvent;
 import org.bukkit.Material;
@@ -16,7 +16,7 @@ public class DisplayTrigger {
     public static int foodInterval = 300;
 
     public static void onTickShow(Player player){
-        if (PlayerDataMain.getPlayerData(player.getUniqueId()) == null){
+        if (PlayerDataObject.INSTANCE.getPlayerDataMap().get(player.getUniqueId()) == null){
             return;
         }
         Stamina.show(player);
@@ -24,13 +24,13 @@ public class DisplayTrigger {
     }
 
     public static void onTickScore(Player player){
-        if (PlayerDataMain.getPlayerData(player.getUniqueId()) == null){
+        if (PlayerDataObject.INSTANCE.getPlayerDataMap().get(player.getUniqueId()) == null){
             return;
         }
         SideBar.sendScoreBoard(player);
     }
     public static void onTickFood(Player player){
-        if (PlayerDataMain.getPlayerData(player.getUniqueId()) == null){
+        if (PlayerDataObject.INSTANCE.getPlayerDataMap().get(player.getUniqueId()) == null){
             return;
         }
         FoodLevel.decrease(player);
@@ -50,12 +50,12 @@ public class DisplayTrigger {
         if (!(e.getEntity() instanceof Player player)){
             return;
         }
-        PlayerData data = PlayerDataMain.getPlayerData(player.getUniqueId());
+        PlayerData data = PlayerDataObject.INSTANCE.getPlayerDataMap().get(player.getUniqueId());
         if (data == null) {
             e.setCancelled(true);
             return;
         }
-        e.setFoodLevel(data.food);
+        e.setFoodLevel(data.getFood());
     }
 
     public static void onEat(PlayerItemConsumeEvent e){
@@ -70,8 +70,7 @@ public class DisplayTrigger {
 
 
     public static void onFall(EntityDamageEvent e){
-        if (e.getEntity() instanceof Player){
-            Player player = (Player) e.getEntity();
+        if (e.getEntity() instanceof Player player){
             if (e.getCause() == EntityDamageEvent.DamageCause.FALL){
                 //落下ダメージを受けた時
                 // 俵nerf
@@ -80,7 +79,7 @@ public class DisplayTrigger {
                 }
 
                 // スタミナによる軽減処理
-                int currentST = PlayerDataMain.getPlayerData(player.getUniqueId()).currentST;
+                int currentST = PlayerDataObject.INSTANCE.getPlayerDataMap().get(player.getUniqueId()).getCurrentST();
                 if (currentST >= 30){
                     e.setDamage(e.getDamage()-0.9);
                     currentST -= 30;
@@ -102,7 +101,7 @@ public class DisplayTrigger {
                     e.setDamage(e.getDamage()-0.9);
                     currentST -= 30;
                 }
-                PlayerDataMain.getPlayerData(player.getUniqueId()).currentST = currentST;
+                PlayerDataObject.INSTANCE.getPlayerDataMap().get(player.getUniqueId()).setCurrentST(currentST);
             }
         }
     }

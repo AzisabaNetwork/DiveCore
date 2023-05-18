@@ -1,8 +1,9 @@
 package com.flora30.divecore.display;
 
-import com.flora30.diveapi.data.PlayerData;
-import com.flora30.diveapi.plugins.RegionAPI;
+import com.flora30.diveapin.data.player.PlayerData;
+import com.flora30.diveapin.data.player.PlayerDataObject;
 import com.flora30.divecore.data.PlayerDataMain;
+import com.flora30.divenew.data.LayerObject;
 import net.md_5.bungee.api.ChatMessageType;
 import net.md_5.bungee.api.chat.TextComponent;
 import org.bukkit.Bukkit;
@@ -15,20 +16,20 @@ public class Stamina {
 
     //3tickごとの反映
     public static void show(Player player){
-        PlayerData data = PlayerDataMain.getPlayerData(player.getUniqueId());
+        PlayerData data = PlayerDataObject.INSTANCE.getPlayerDataMap().get(player.getUniqueId());
         if (data == null){
             return;
         }
 
-        int current = data.currentST;
+        int current = data.getCurrentST();
 
         //自動回復（地上のみ）
-        if(((Entity)player).isOnGround() && current < data.maxST){
+        if(((Entity)player).isOnGround() && current < data.getMaxST()){
             if (player.isSneaking() && !player.isSprinting()){
-                data.currentST = current+3;
+                data.setCurrentST(current+3);
             }
             else{
-                data.currentST++;
+                data.setCurrentST(current+1);
             }
         }
 
@@ -55,15 +56,15 @@ public class Stamina {
     }
 
     private static String getMeterDisplay(Player player){
-        PlayerData data = PlayerDataMain.getPlayerData(player.getUniqueId());
-        if (data == null || data.layerData == null || data.layerData.layer == null || data.layerData.layer.equals("no")){
+        PlayerData data = PlayerDataObject.INSTANCE.getPlayerDataMap().get(player.getUniqueId());
+        if (data == null || data.getLayerData().getLayer() == null || data.getLayerData().getLayer().equals("no")){
             return "";
         }
-        if (data.layerData.layer.equals("oldOrth")){
+        if (data.getLayerData().getLayer().equals("oldOrth")){
             return "";
         }
         double fallPlus = 200 - player.getLocation().getY();
-        double fallLayer = RegionAPI.getLayer(data.layerData.layer).fall;
+        double fallLayer = LayerObject.INSTANCE.getLayerMap().get(data.getLayerData().getLayer()).getFall();
         double fall = fallPlus+fallLayer;
 
         // 境界付近で黄色にする（猶予10m）
@@ -75,12 +76,12 @@ public class Stamina {
     }
 
     private static String getStaminaBar(Player player){
-        PlayerData data = PlayerDataMain.getPlayerData(player.getUniqueId());
+        PlayerData data = PlayerDataObject.INSTANCE.getPlayerDataMap().get(player.getUniqueId());
         if (data == null){
             return "";
         }
-        int max = data.maxST;
-        int current = data.currentST;
+        int max = data.getMaxST();
+        int current = data.getCurrentST();
 
         int i_max = max / 20;
         int i_current = current / 20;
@@ -98,13 +99,9 @@ public class Stamina {
             str.append(ChatColor.GREEN);
         }
 
-        for (int i = 0; i < i_current; i++){
-            str.append(bar);
-        }
+        str.append(bar.repeat(Math.max(0, i_current)));
         str.append(ChatColor.GRAY);
-        for (int i = 0; i < i_max - i_current; i++){
-            str.append(bar);
-        }
+        str.append(bar.repeat(Math.max(0, i_max - i_current)));
         str.append(ChatColor.WHITE);
         str.append(" ]");
 
@@ -112,20 +109,20 @@ public class Stamina {
     }
 
     private static String getCoolDown(Player player){
-        PlayerData data = PlayerDataMain.getPlayerData(player.getUniqueId());
+        PlayerData data = PlayerDataObject.INSTANCE.getPlayerDataMap().get(player.getUniqueId());
         if (data == null){
             return "";
         }
 
-        String name = data.displayCoolDownName;
+        String name = data.getDisplayCoolDownName();
         if (name == null){
             return "";
         }
-        if (data.coolDownMap.get(name) == null){
+        if (data.getCoolDownMap().get(name) == null){
             return " "+ChatColor.WHITE+"再使用 > ok";
         }
 
-        double coolDown = data.coolDownMap.get(name);
+        double coolDown = data.getCoolDownMap().get(name);
 
         if (coolDown == 0){
             return " "+ChatColor.WHITE+"再使用 > ok";
@@ -137,11 +134,11 @@ public class Stamina {
     }
 
     private static void resetCoolDownDisplay(Player player){
-        PlayerData data = PlayerDataMain.getPlayerData(player.getUniqueId());
+        PlayerData data = PlayerDataObject.INSTANCE.getPlayerDataMap().get(player.getUniqueId());
         if (data == null){
             return;
         }
 
-        data.displayCoolDownName = null;
+        data.setDisplayCoolDownName(null);
     }
 }
