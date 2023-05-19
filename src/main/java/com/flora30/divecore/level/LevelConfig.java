@@ -1,8 +1,11 @@
 package com.flora30.divecore.level;
 
 import com.flora30.divecore.DiveCore;
-import com.flora30.divecore.level.type.PointType;
 import com.flora30.divecore.tools.Config;
+import com.flora30.divenew.data.LevelObject;
+import com.flora30.divenew.data.Point;
+import com.flora30.divenew.data.PointObject;
+import com.flora30.divenew.data.PointType;
 import org.bukkit.Bukkit;
 import org.bukkit.configuration.ConfigurationSection;
 import org.bukkit.configuration.file.FileConfiguration;
@@ -85,10 +88,10 @@ public class LevelConfig extends Config {
 
     private void calcLvMap(double firstExp, double increaseRate, double plus, int limit){
         double current = firstExp;
-        Level.putExpMap(1, (int) firstExp);
+        LevelObject.INSTANCE.getExpMap().put(1, (int) firstExp);
         for (int i = 2; i <= limit; i++){
             current = current * increaseRate + plus;
-            Level.putExpMap(i, (int) current);
+            LevelObject.INSTANCE.getExpMap().put(i, (int) current);
         }
     }
 
@@ -99,24 +102,24 @@ public class LevelConfig extends Config {
         if (secType == null) return;
 
         int maxLv = 0;
-        Map<Integer,PointData> pointMap;
-        Map<Integer,PointData> applyMap;
+        Map<Integer, Point> pointMap;
+        Map<Integer, Point> applyMap;
         switch (type) {
             case Int -> {
-                pointMap = Point.intMap;
-                applyMap = Point.intApplyMap;
+                pointMap = PointObject.INSTANCE.getIntMap();
+                applyMap = PointObject.INSTANCE.getIntApplyMap();
             }
             case Vit -> {
-                pointMap = Point.vitMap;
-                applyMap = Point.vitApplyMap;
+                pointMap = PointObject.INSTANCE.getVitMap();
+                applyMap = PointObject.INSTANCE.getVitApplyMap();
             }
             case Atk -> {
-                pointMap = Point.atkMap;
-                applyMap = Point.atkApplyMap;
+                pointMap = PointObject.INSTANCE.getAtkMap();
+                applyMap = PointObject.INSTANCE.getAtkApplyMap();
             }
             case Luc -> {
-                pointMap = Point.lucMap;
-                applyMap = Point.lucApplyMap;
+                pointMap = PointObject.INSTANCE.getLucMap();
+                applyMap = PointObject.INSTANCE.getLucApplyMap();
             }
             default -> {
                 return;
@@ -138,16 +141,17 @@ public class LevelConfig extends Config {
             }
 
             // ポイント取得ごとに増加する効果
-            PointData data = new PointData();
-            data.stamina = secLv.getDouble("Stamina");
-            data.health = secLv.getDouble("Health");
-            data.exp = secLv.getDouble("Exp");
-            data.weapon = secLv.getDouble("Weapon");
-            data.artifact = secLv.getDouble("Artifact");
-            data.lucky = secLv.getDouble("Lucky");
-            data.gatherMonster = secLv.getDouble("GatherMonster");
-            data.gatherRelic = secLv.getDouble("GatherRelic");
-            pointMap.put(lv, data);
+            Point point = new Point(
+                    secLv.getInt("Stamina"),
+                    secLv.getInt("Health"),
+                    secLv.getInt("Exp"),
+                    secLv.getInt("Weapon"),
+                    secLv.getInt("Artifact"),
+                    secLv.getInt("Lucky"),
+                    secLv.getInt("GatherMonster"),
+                    secLv.getInt("GatherRelic")
+            );
+            pointMap.put(lv, point);
 
             maxLv = Math.max(maxLv,lv);
         }
@@ -160,25 +164,46 @@ public class LevelConfig extends Config {
     /**
      * pointMapを元にして「適用時のデータ」を作成する
      */
-    private void calcPointApplyMap(Map<Integer,PointData> pointMap, Map<Integer,PointData> applyMap, int max){
-        PointData total = new PointData();
+    private void calcPointApplyMap(Map<Integer,Point> pointMap, Map<Integer,Point> applyMap, int max){
 
-        // ポイント増加で獲得できるものをtotalに加える
+        int stamina = 0;
+        int health = 0;
+        int exp = 0;
+        int weapon = 0;
+        int artifact = 0;
+        int lucky = 0;
+        int gatherMonster = 0;
+        int gatherRelic = 0;
+
+
+        // ポイント増加で獲得できるものを加える
         for (int p = 1; p <= max; p++){
-            PointData data = pointMap.get(p);
+            Point point = pointMap.get(p);
 
-            if (data != null) {
-                total.stamina += data.stamina;
-                total.health += data.health;
-                total.exp += data.exp;
-                total.weapon += data.weapon;
-                total.artifact += data.artifact;
-                total.lucky += data.lucky;
-                total.gatherMonster += data.gatherMonster;
-                total.gatherRelic += data.gatherRelic;
+            if (point != null) {
+                stamina += point.getStamina();
+                health += point.getHealth();
+                exp += point.getExp();
+                weapon += point.getWeapon();
+                artifact += point.getArtifact();
+                lucky += point.getLucky();
+                gatherMonster += point.getGatherMonster();
+                gatherRelic += point.getGatherRelic();
             }
 
-            applyMap.put(p,total.clone());
+            // ここまでの合計を記録
+            Point total = new Point(
+                    stamina,
+                    health,
+                    exp,
+                    weapon,
+                    artifact,
+                    lucky,
+                    gatherMonster,
+                    gatherRelic
+            );
+            applyMap.put(p,total);
         }
+
     }
 }

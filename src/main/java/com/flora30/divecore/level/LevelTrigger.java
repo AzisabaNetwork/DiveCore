@@ -1,25 +1,24 @@
 package com.flora30.divecore.level;
 
-import com.flora30.diveapi.data.ItemData;
-import com.flora30.diveapi.data.PlayerData;
-import com.flora30.diveapi.event.LayerChangeEvent;
-import com.flora30.diveapi.event.LayerLoadEvent;
-import com.flora30.diveapi.plugins.ItemAPI;
-import com.flora30.diveapi.plugins.RegionAPI;
-import com.flora30.diveapi.tools.ItemType;
+import com.comphenix.protocol.PacketType;
+import com.comphenix.protocol.ProtocolLibrary;
+import com.comphenix.protocol.ProtocolManager;
+import com.comphenix.protocol.events.PacketContainer;
+import com.flora30.diveapin.ItemMain;
+import com.flora30.diveapin.data.player.PlayerData;
+import com.flora30.diveapin.data.player.PlayerDataObject;
+import com.flora30.diveapin.event.LayerChangeEvent;
+import com.flora30.diveapin.event.LayerLoadEvent;
 import com.flora30.divecore.DiveCore;
-import com.flora30.divecore.data.PlayerDataMain;
 import com.flora30.divecore.level.gui.SetPointGUI;
 import com.flora30.divecore.level.gui.StatusGUI;
 import com.flora30.divedb.DiveDBAPI;
+import com.flora30.divenew.data.item.ItemData;
+import com.flora30.divenew.data.item.ItemDataObject;
+import com.flora30.divenew.data.item.ItemType;
 import io.lumine.xikage.mythicmobs.api.bukkit.events.MythicMobDeathEvent;
-import net.minecraft.network.protocol.Packet;
-import net.minecraft.network.protocol.game.ClientGamePacketListener;
-import net.minecraft.network.protocol.game.ClientboundSetHealthPacket;
-import net.minecraft.server.level.ServerPlayer;
 import org.bukkit.Bukkit;
 import org.bukkit.ChatColor;
-import org.bukkit.craftbukkit.v1_17_R1.entity.CraftPlayer;
 import org.bukkit.entity.Player;
 import org.bukkit.event.inventory.ClickType;
 import org.bukkit.event.inventory.InventoryClickEvent;
@@ -29,13 +28,18 @@ import org.bukkit.event.player.PlayerInteractEvent;
 import org.bukkit.event.player.PlayerJoinEvent;
 import org.bukkit.inventory.ItemStack;
 
+import java.lang.reflect.InvocationTargetException;
+
 public class LevelTrigger {
 
+    // 経験値追加はLayerでやる
+    /*
     public static void onLayerLoad(LayerLoadEvent e){
         int exp = e.getSection().getInt("exp",10);
         Bukkit.getLogger().info("[LayerLoad]Event listened "+e.getKey()+" -> "+exp);
         LevelMain.putLayerExp(e.getKey(),exp);
     }
+     */
 
     public static void onTickDisplay(Player player){
         LevelMain.display(player);
@@ -58,16 +62,16 @@ public class LevelTrigger {
         if (e.getInventory().getType() == InventoryType.CRAFTING) {
             //Bukkit.getLogger().info("Player inv click");
 
-            PlayerData playerData = PlayerDataMain.getPlayerData(e.getWhoClicked().getUniqueId());
+            PlayerData playerData = PlayerDataObject.INSTANCE.getPlayerDataMap().get(e.getWhoClicked().getUniqueId());
             if (playerData == null) return;
 
             // 判定するアイテム
             ItemStack checkItem = e.getOldCursor();
 
-            ItemData data = ItemAPI.getItemData(ItemAPI.getItemID(checkItem));
+            ItemData data = ItemDataObject.INSTANCE.getItemDataMap().get(ItemMain.INSTANCE.getItemId(checkItem));
             if (data == null) return;
 
-            if (data.type == ItemType.Armor && playerData.levelData.level < data.level) {
+            if (data.getType() == ItemType.Armor && playerData.getLevelData().getLevel() < data.getLevel()) {
                 e.setCancelled(true);
                 e.getWhoClicked().sendMessage(ChatColor.RED + "防具の必要レベルに達していません");
             }
@@ -90,11 +94,11 @@ public class LevelTrigger {
                 return;
             }
             // 経験値アイテム？
-            ItemData data = ItemAPI.getItemData(ItemAPI.getItemID(item));
+            ItemData data = ItemDataObject.INSTANCE.getItemDataMap().get(ItemMain.INSTANCE.getItemId(item));
             if (data == null) return;
-            if (data.exp != 0){
+            if (data.getExp() != 0){
                 e.setCancelled(true);
-                LevelMain.addExp((Player)e.getWhoClicked(),data.exp * item.getAmount());
+                LevelMain.addExp((Player)e.getWhoClicked(),data.getExp() * item.getAmount());
                 e.getClickedInventory().setItem(e.getSlot(),null);
             }
         }
@@ -103,7 +107,7 @@ public class LevelTrigger {
         if (e.getClickedInventory().getType() == InventoryType.PLAYER) {
             //Bukkit.getLogger().info("Player inv click");
 
-            PlayerData playerData = PlayerDataMain.getPlayerData(e.getWhoClicked().getUniqueId());
+            PlayerData playerData = PlayerDataObject.INSTANCE.getPlayerDataMap().get(e.getWhoClicked().getUniqueId());
             if (playerData == null) return;
 
             // 判定するアイテム
@@ -120,10 +124,10 @@ public class LevelTrigger {
             }
 
             if (checkItem == null) return;
-            ItemData data = ItemAPI.getItemData(ItemAPI.getItemID(checkItem));
+            ItemData data = ItemDataObject.INSTANCE.getItemDataMap().get(ItemMain.INSTANCE.getItemId(checkItem));
             if (data == null) return;
 
-            if (data.type == ItemType.Armor && playerData.levelData.level < data.level) {
+            if (data.getType() == ItemType.Armor && playerData.getLevelData().getLevel() < data.getLevel()) {
                 e.setCancelled(true);
                 e.getWhoClicked().sendMessage(ChatColor.RED + "防具の必要レベルに達していません");
             }
@@ -131,15 +135,15 @@ public class LevelTrigger {
     }
 
     public static void onInteract(PlayerInteractEvent e) {
-        PlayerData playerData = PlayerDataMain.getPlayerData(e.getPlayer().getUniqueId());
+        PlayerData playerData = PlayerDataObject.INSTANCE.getPlayerDataMap().get(e.getPlayer().getUniqueId());
         if (playerData == null) return;
         ItemStack item = e.getItem();
         if (item == null) return;
 
-        ItemData itemData = ItemAPI.getItemData(ItemAPI.getItemID(item));
+        ItemData itemData = ItemDataObject.INSTANCE.getItemDataMap().get(ItemMain.INSTANCE.getItemId(item));
         if (itemData == null) return;
 
-        if (itemData.type == ItemType.Armor && playerData.levelData.level < itemData.level) {
+        if (itemData.getType() == ItemType.Armor && playerData.getLevelData().getLevel() < itemData.getLevel()) {
             e.setCancelled(true);
             e.getPlayer().sendMessage(ChatColor.RED + "防具の必要レベルに達していません");
         }
@@ -163,7 +167,7 @@ public class LevelTrigger {
     }
 
     public static void onJoin(PlayerJoinEvent e){
-        PlayerData data = PlayerDataMain.getPlayerData(e.getPlayer().getUniqueId());
+        PlayerData data = PlayerDataObject.INSTANCE.getPlayerDataMap().get(e.getPlayer().getUniqueId());
         if (data == null){
             //Bukkit.getLogger().info("[DiveCore-Level]データ待ち - "+e.getPlayer().getDisplayName());
             DiveCore.plugin.delayedTask(2, () -> onJoin(e));
@@ -179,13 +183,17 @@ public class LevelTrigger {
             //Bukkit.getLogger().info("health is "+e.getPlayer().getHealth() + " | set " +hp);
 
             // HPを更新するパケット
-            ServerPlayer serverPlayer = ((CraftPlayer)e.getPlayer()).getHandle();
-            Packet<ClientGamePacketListener> packet = new ClientboundSetHealthPacket((float)e.getPlayer().getHealth(), data.food, e.getPlayer().getSaturation());
-            serverPlayer.connection.send(packet);
+            ProtocolManager manager = ProtocolLibrary.getProtocolManager();
+            PacketContainer packet = new PacketContainer(PacketType.Play.Server.UPDATE_HEALTH);
+            packet.getFloat().write(0,(float)e.getPlayer().getHealth());
+            packet.getIntegers().write(0,data.getFood());
+            packet.getFloat().write(1,e.getPlayer().getSaturation());
+            manager.sendServerPacket(e.getPlayer(), packet);
 
-        } catch (NumberFormatException ignored){}
+        } catch (NumberFormatException ignored){} catch (InvocationTargetException ex) {
+            throw new RuntimeException(ex);
+        }
 
-        RegionAPI.layerCheck(e.getPlayer());
-        data.currentST = data.maxST;
+        data.setCurrentST(data.getMaxST());
     }
 }

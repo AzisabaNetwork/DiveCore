@@ -1,9 +1,10 @@
 package com.flora30.divecore.level.gui;
 
-import com.flora30.diveapi.data.player.LevelData;
-import com.flora30.diveapi.event.HelpEvent;
-import com.flora30.diveapi.tools.GuiItem;
-import com.flora30.diveapi.tools.HelpType;
+import com.flora30.diveapin.data.player.LevelData;
+import com.flora30.diveapin.data.player.PlayerDataObject;
+import com.flora30.diveapin.event.HelpEvent;
+import com.flora30.diveapin.event.HelpType;
+import com.flora30.diveapin.util.GuiItem;
 import com.flora30.divecore.data.PlayerDataMain;
 import org.bukkit.Bukkit;
 import org.bukkit.entity.Player;
@@ -20,17 +21,17 @@ public class StatusGUI {
     }
 
     private static Inventory create(UUID id) {
-        LevelData data = PlayerDataMain.getPlayerData(id).levelData;
-        Inventory gui = GuiItem.grayBack(Bukkit.createInventory(null,36, "ステータス確認"));
+        LevelData data = PlayerDataObject.INSTANCE.getPlayerDataMap().get(id).getLevelData();
+        Inventory gui = GuiItem.INSTANCE.grayBack(Bukkit.createInventory(null,36, "ステータス確認"));
 
-        gui.setItem(4,SetPointGUI.getCurrentPoint(data.rawPoint));
+        gui.setItem(4,SetPointGUI.getCurrentPoint(data.getRawPoint()));
 
-        gui.setItem(19,SetPointGUI.getIconAtk(data.pointAtk));
-        gui.setItem(21,SetPointGUI.getIconVit(data.pointVit));
-        gui.setItem(23,SetPointGUI.getIconInt(data.pointInt));
-        gui.setItem(25,SetPointGUI.getIconLuc(data.pointLuc));
+        gui.setItem(19,SetPointGUI.getIconAtk(data.getPointAtk()));
+        gui.setItem(21,SetPointGUI.getIconVit(data.getPointVit()));
+        gui.setItem(23,SetPointGUI.getIconInt(data.getPointInt()));
+        gui.setItem(25,SetPointGUI.getIconLuc(data.getPointLuc()));
 
-        gui.setItem(35,GuiItem.getReturn());
+        gui.setItem(35,GuiItem.INSTANCE.getReturn());
 
         return gui;
     }

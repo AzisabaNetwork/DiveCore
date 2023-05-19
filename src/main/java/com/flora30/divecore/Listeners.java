@@ -1,5 +1,7 @@
 package com.flora30.divecore;
 
+import com.flora30.diveapin.event.HelpEvent;
+import com.flora30.diveapin.event.LayerChangeEvent;
 import com.flora30.diveapin.event.LayerLoadEvent;
 import com.flora30.divecore.api.event.RegisterSideBarEvent;
 import com.flora30.divecore.base.BaseTrigger;
@@ -219,7 +221,7 @@ public class Listeners implements Listener, CommandExecutor {
 
     @EventHandler
     public void onLayerLoad(LayerLoadEvent e) {
-        LevelTrigger.onLayerLoad(e);
+        //LevelTrigger.onLayerLoad(e);
         BaseTrigger.onLayerLoad(e);
     }
 

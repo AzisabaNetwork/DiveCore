@@ -4,10 +4,9 @@ import com.flora30.diveapin.data.player.LevelData;
 import com.flora30.diveapin.data.player.PlayerDataObject;
 import com.flora30.diveapin.util.GuiItem;
 import com.flora30.diveapin.util.GuiItemType;
-import com.flora30.divecore.data.PlayerDataMain;
-import com.flora30.divecore.level.Point;
-import com.flora30.divecore.level.PointData;
-import com.flora30.divecore.level.type.PointType;
+import com.flora30.divenew.data.Point;
+import com.flora30.divenew.data.PointObject;
+import com.flora30.divenew.data.PointType;
 import org.bukkit.Bukkit;
 import org.bukkit.ChatColor;
 import org.bukkit.entity.Player;
@@ -17,6 +16,7 @@ import org.bukkit.inventory.meta.ItemMeta;
 
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Map;
 import java.util.UUID;
 
 public class SetPointGUI {
@@ -48,8 +48,8 @@ public class SetPointGUI {
     }
 
     public static ItemStack getIconLuc(int point){
-        PointData data = Point.lucApplyMap.get(point);
-        if (point == 0) data = new PointData();
+        Point data = PointObject.INSTANCE.getLucApplyMap().get(point);
+        if (point == 0) data = new Point(0,0,0,0,0,0,0,0);
 
         ItemStack item = GuiItem.INSTANCE.getItem(GuiItemType.PointLuc);
         if (point == 0) item = GuiItem.INSTANCE.getItem(GuiItemType.PointZero);
@@ -60,8 +60,8 @@ public class SetPointGUI {
 
         List<String> lore = new ArrayList<>();
         lore.add(ChatColor.WHITE+"");
-        lore.add(ChatColor.WHITE+"豪華なチェストの確率 ‣ "+ChatColor.GOLD+"+"+(int) data.lucky+"％");
-        lore.add(ChatColor.WHITE+"採集の遺物獲得率 ‣ "+ChatColor.GOLD+"+"+(int) data.gatherRelic+"％");
+        lore.add(ChatColor.WHITE+"豪華なチェストの確率 ‣ "+ChatColor.GOLD+"+"+(int) data.getLucky()+"％");
+        lore.add(ChatColor.WHITE+"採集の遺物獲得率 ‣ "+ChatColor.GOLD+"+"+(int) data.getGatherRelic()+"％");
         lore.add(ChatColor.WHITE+"");
 
         meta.setLore(lore);
@@ -80,16 +80,16 @@ public class SetPointGUI {
         meta.setDisplayName(ChatColor.WHITE+"<< クリックでポイントを振る >>");
 
         // 次に追加されるボーナスの表示
-        int nextPoint = Point.getNextPoint(PointType.Luc, point);
-        PointData nPointData = Point.lucMap.get(nextPoint);
+        int nextPoint = getNextPoint(PointType.Luc, point);
+        Point data = PointObject.INSTANCE.getLucMap().get(nextPoint);
         lore.add(ChatColor.WHITE+"");
-        if (nPointData != null) {
+        if (data != null) {
             lore.add(ChatColor.WHITE+"追加ボーナス ‣ 幸運 "+nextPoint);
-            if (nPointData.lucky != 0) {
-                lore.add(ChatColor.WHITE+"豪華なチェストの確率 ‣ "+ChatColor.GOLD+"+"+(int) nPointData.lucky+"％");
+            if (data.getLucky() != 0) {
+                lore.add(ChatColor.WHITE+"豪華なチェストの確率 ‣ "+ChatColor.GOLD+"+"+data.getLucky()+"％");
             }
-            if (nPointData.gatherRelic != 0) {
-                lore.add(ChatColor.WHITE+"採集の遺物獲得率 ‣ "+ChatColor.GOLD+"+"+(int) nPointData.gatherRelic+"％");
+            if (data.getGatherRelic() != 0) {
+                lore.add(ChatColor.WHITE+"採集の遺物獲得率 ‣ "+ChatColor.GOLD+"+"+data.getGatherRelic()+"％");
             }
         } else {
             lore.add(ChatColor.WHITE+"追加ボーナス ‣ 以降は未実装");
@@ -102,8 +102,8 @@ public class SetPointGUI {
     }
 
     public static ItemStack getIconInt(int point){
-        PointData data = Point.intApplyMap.get(point);
-        if (point == 0) data = new PointData();
+        Point data = PointObject.INSTANCE.getIntApplyMap().get(point);
+        if (point == 0) data = new Point(0,0,0,0,0,0,0,0);
 
         ItemStack item = GuiItem.INSTANCE.getItem(GuiItemType.PointInt);
         if (point == 0) item = GuiItem.INSTANCE.getItem(GuiItemType.PointZero);
@@ -114,8 +114,8 @@ public class SetPointGUI {
 
         List<String> lore = new ArrayList<>();
         lore.add(ChatColor.WHITE+"");
-        lore.add(ChatColor.WHITE+"経験値倍率 ‣ "+ChatColor.GOLD+"+"+data.exp+"％");
-        lore.add(ChatColor.WHITE+"採掘・伐採の原生生物出現率 ‣ "+ChatColor.GOLD+data.gatherMonster+"％");
+        lore.add(ChatColor.WHITE+"経験値倍率 ‣ "+ChatColor.GOLD+"+"+data.getExp()+"％");
+        lore.add(ChatColor.WHITE+"採掘・伐採の原生生物出現率 ‣ "+ChatColor.GOLD+data.getGatherMonster()+"％");
         lore.add(ChatColor.WHITE+"");
 
         meta.setLore(lore);
@@ -134,16 +134,16 @@ public class SetPointGUI {
         meta.setDisplayName(ChatColor.WHITE+"<< クリックでポイントを振る >>");
 
         // 次に追加されるボーナスの表示
-        int nextPoint = Point.getNextPoint(PointType.Int, point);
-        PointData nPointData = Point.intMap.get(nextPoint);
+        int nextPoint = getNextPoint(PointType.Int, point);
+        Point data = PointObject.INSTANCE.getIntMap().get(nextPoint);
         lore.add(ChatColor.WHITE+"");
-        if (nPointData != null) {
+        if (data != null) {
             lore.add(ChatColor.WHITE+"追加ボーナス ‣ 知識 "+nextPoint);
-            if (nPointData.exp != 0) {
-                lore.add(ChatColor.WHITE+"経験値倍率 ‣ "+ChatColor.GOLD+"+"+(int) nPointData.exp+"％");
+            if (data.getExp() != 0) {
+                lore.add(ChatColor.WHITE+"経験値倍率 ‣ "+ChatColor.GOLD+"+"+data.getExp()+"％");
             }
-            if (nPointData.gatherMonster != 0) {
-                lore.add(ChatColor.WHITE+"採掘・伐採の原生生物出現率 ‣ "+ChatColor.GOLD+(int) nPointData.gatherMonster+"％");
+            if (data.getGatherMonster() != 0) {
+                lore.add(ChatColor.WHITE+"採掘・伐採の原生生物出現率 ‣ "+ChatColor.GOLD+data.getGatherMonster()+"％");
             }
         } else {
             lore.add(ChatColor.WHITE+"追加ボーナス ‣ 以降は未実装");
@@ -156,8 +156,8 @@ public class SetPointGUI {
     }
 
     public static ItemStack getIconVit(int point){
-        PointData data = Point.vitApplyMap.get(point);
-        if (point == 0) data = new PointData();
+        Point data = PointObject.INSTANCE.getVitApplyMap().get(point);
+        if (point == 0) data = new Point(0,0,0,0,0,0,0,0);
 
         ItemStack item = GuiItem.INSTANCE.getItem(GuiItemType.PointVit);
         if (point == 0) item = GuiItem.INSTANCE.getItem(GuiItemType.PointZero);
@@ -168,8 +168,8 @@ public class SetPointGUI {
 
         List<String> lore = new ArrayList<>();
         lore.add(ChatColor.WHITE+"");
-        lore.add(ChatColor.WHITE+"HP増加 ‣ "+ChatColor.GOLD+"+"+(int) data.health);
-        lore.add(ChatColor.WHITE+"スタミナ増加 ‣ "+ChatColor.GOLD+"+"+(int) data.stamina / 20);
+        lore.add(ChatColor.WHITE+"HP増加 ‣ "+ChatColor.GOLD+"+"+data.getHealth());
+        lore.add(ChatColor.WHITE+"スタミナ増加 ‣ "+ChatColor.GOLD+"+"+data.getStamina() / 20);
         lore.add(ChatColor.WHITE+"");
 
 
@@ -188,16 +188,16 @@ public class SetPointGUI {
         meta.setDisplayName(ChatColor.WHITE+"<< クリックでポイントを振る >>");
 
         // 次に追加されるボーナスの表示
-        int nextPoint = Point.getNextPoint(PointType.Vit, point);
-        PointData nPointData = Point.vitMap.get(nextPoint);
+        int nextPoint = getNextPoint(PointType.Vit, point);
+        Point data = PointObject.INSTANCE.getVitMap().get(nextPoint);
         lore.add(ChatColor.WHITE+"");
-        if (nPointData != null) {
+        if (data != null) {
             lore.add(ChatColor.WHITE+"追加ボーナス ‣ 体力 "+nextPoint);
-            if (nPointData.health != 0) {
-                lore.add(ChatColor.WHITE+"HP増加 ‣ "+ChatColor.GOLD+"+"+(int) nPointData.health);
+            if (data.getHealth() != 0) {
+                lore.add(ChatColor.WHITE+"HP増加 ‣ "+ChatColor.GOLD+"+"+data.getHealth());
             }
-            if (nPointData.stamina != 0) {
-                lore.add(ChatColor.WHITE+"スタミナ増加 ‣ "+ChatColor.GOLD+"+"+(int) nPointData.stamina / 20);
+            if (data.getStamina() != 0) {
+                lore.add(ChatColor.WHITE+"スタミナ増加 ‣ "+ChatColor.GOLD+"+"+data.getStamina() / 20);
             }
         } else {
             lore.add(ChatColor.WHITE+"追加ボーナス ‣ 以降は未実装");
@@ -210,8 +210,8 @@ public class SetPointGUI {
     }
 
     public static ItemStack getIconAtk(int point){
-        PointData data = Point.atkApplyMap.get(point);
-        if (point == 0) data = new PointData();
+        Point data = PointObject.INSTANCE.getAtkApplyMap().get(point);
+        if (point == 0) data = new Point(0,0,0,0,0,0,0,0);
 
         ItemStack item = GuiItem.INSTANCE.getItem(GuiItemType.PointAtk);
         if (point == 0) item = GuiItem.INSTANCE.getItem(GuiItemType.PointZero);
@@ -222,8 +222,8 @@ public class SetPointGUI {
 
         List<String> lore = new ArrayList<>();
         lore.add(ChatColor.WHITE+"");
-        lore.add(ChatColor.WHITE+"攻撃力増加（武器） ‣ "+ChatColor.GOLD+"+"+(int) data.weapon+"％");
-        lore.add(ChatColor.WHITE+"攻撃力増加（遺物） ‣ "+ChatColor.GOLD+"+"+(int) data.artifact+"％");
+        lore.add(ChatColor.WHITE+"攻撃力増加（武器） ‣ "+ChatColor.GOLD+"+"+data.getWeapon()+"％");
+        lore.add(ChatColor.WHITE+"攻撃力増加（遺物） ‣ "+ChatColor.GOLD+"+"+data.getArtifact()+"％");
         lore.add(ChatColor.WHITE+"");
 
 
@@ -242,16 +242,16 @@ public class SetPointGUI {
         meta.setDisplayName(ChatColor.WHITE+"<< クリックでポイントを振る >>");
 
         // 次に追加されるボーナスの表示
-        int nextPoint = Point.getNextPoint(PointType.Atk, point);
-        PointData nPointData = Point.atkMap.get(nextPoint);
+        int nextPoint = getNextPoint(PointType.Atk, point);
+        Point data = PointObject.INSTANCE.getAtkMap().get(nextPoint);
         lore.add(ChatColor.WHITE+"");
-        if (nPointData != null) {
+        if (data != null) {
             lore.add(ChatColor.WHITE+"追加ボーナス ‣ 武力 "+nextPoint);
-            if (nPointData.weapon != 0) {
-                lore.add(ChatColor.WHITE+"攻撃力増加（武器） ‣ "+ChatColor.GOLD+"+"+(int) nPointData.weapon+"％");
+            if (data.getWeapon() != 0) {
+                lore.add(ChatColor.WHITE+"攻撃力増加（武器） ‣ "+ChatColor.GOLD+"+"+data.getWeapon()+"％");
             }
-            if (nPointData.artifact != 0) {
-                lore.add(ChatColor.WHITE+"攻撃力増加（遺物） ‣ "+ChatColor.GOLD+"+"+(int) nPointData.artifact+"％");
+            if (data.getArtifact() != 0) {
+                lore.add(ChatColor.WHITE+"攻撃力増加（遺物） ‣ "+ChatColor.GOLD+"+"+data.getArtifact()+"％");
             }
         } else {
             lore.add(ChatColor.WHITE+"追加ボーナス ‣ 以降は未実装");
@@ -279,5 +279,26 @@ public class SetPointGUI {
         point = Math.min(point,64);
         point = Math.max(point,1);
         return point;
+    }
+
+    /**
+     * 現在の「次」に得られるものがある場所
+     */
+    public static int getNextPoint(PointType type, int point) {
+        Map<Integer,Point> map;
+        switch (type){
+            case Int -> map = PointObject.INSTANCE.getIntMap();
+            case Vit -> map = PointObject.INSTANCE.getVitMap();
+            case Atk -> map = PointObject.INSTANCE.getAtkMap();
+            case Luc -> map = PointObject.INSTANCE.getLucMap();
+            default -> {return -1;}
+        }
+
+        for (int mapPoint : map.keySet()) {
+            if (mapPoint <= point) continue;
+            return mapPoint;
+        }
+
+        return -1;
     }
 }

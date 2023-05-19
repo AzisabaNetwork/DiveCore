@@ -1,11 +1,16 @@
 package com.flora30.divecore.level;
 
-import com.flora30.diveapi.data.PlayerData;
-import com.flora30.diveapi.data.player.LayerData;
-import com.flora30.diveapi.data.player.LevelData;
+import com.flora30.diveapin.data.player.LayerData;
+import com.flora30.diveapin.data.player.LevelData;
+import com.flora30.diveapin.data.player.PlayerData;
+import com.flora30.diveapin.data.player.PlayerDataObject;
 import com.flora30.divecore.DiveCore;
 import com.flora30.divecore.data.PlayerDataMain;
 import com.flora30.divecore.tools.Mathing;
+import com.flora30.divenew.data.Layer;
+import com.flora30.divenew.data.LayerObject;
+import com.flora30.divenew.data.LevelObject;
+import com.flora30.divenew.data.PointObject;
 import io.lumine.xikage.mythicmobs.io.MythicConfig;
 import io.lumine.xikage.mythicmobs.mobs.MythicMob;
 import org.bukkit.Bukkit;
@@ -19,32 +24,33 @@ import java.util.Map;
 import java.util.Objects;
 
 public class LevelMain {
-    //Layer | 経験値
-    private static final Map<String,Integer> layerExpMap = new HashMap<>();
+
+    // 使ってない
     //level | 減衰倍率
-    private static final Map<Integer,Double> gapRateMap = new HashMap<>();
+    //private static final Map<Integer,Double> gapRateMap = new HashMap<>();
+
     //最低値
     private static double leastGapRate = 0;
 
     public static void onLayerChange(Player player, String next){
-        LayerData data = PlayerDataMain.getPlayerData(player.getUniqueId()).layerData;
+        LayerData data = PlayerDataObject.INSTANCE.getPlayerDataMap().get(player.getUniqueId()).getLayerData();
         //訪れていたら終了
-        if (data.visitedLayers.contains(next)){
+        if (data.getVisitedLayers().contains(next)){
             return;
         }
 
-        Bukkit.getLogger().info(player.getDisplayName()+"エリア「"+next+"」を発見");
-        player.sendMessage("新規エリアを発見！ ‣ "+layerExpMap.get(next));
-        addExp(player,layerExpMap.get(next));
+        Bukkit.getLogger().info(player.getDisplayName()+" エリア「"+next+"」を発見");
+        Layer layer = LayerObject.INSTANCE.getLayerMap().get(next);
+        player.sendMessage("新規エリアを発見！ ‣ "+layer.getExp());
+        addExp(player,layer.getExp());
     }
 
     public static void onMobDeath(LivingEntity killer, MythicMob mobType){
-        if (!(killer instanceof Player)){
+        if (!(killer instanceof Player player)){
             return;
         }
-        Player player = (Player) killer;
-        LevelData data = PlayerDataMain.getPlayerData(player.getUniqueId()).levelData;
-        int playerLevel = data.level;
+        LevelData data = PlayerDataObject.INSTANCE.getPlayerDataMap().get(player.getUniqueId()).getLevelData();
+        int playerLevel = data.getLevel();
 
         MythicConfig mythicConfig = mobType.getConfig();
         if (mythicConfig == null){
@@ -75,29 +81,29 @@ public class LevelMain {
 
 
     public static void addExp(Player player, int exp){
-        LevelData data = PlayerDataMain.getPlayerData(player.getUniqueId()).levelData;
-        double rated = Point.getExpRate(data.pointInt) * exp;
-        data.addExp((int) rated);
+        LevelData data = PlayerDataObject.INSTANCE.getPlayerDataMap().get(player.getUniqueId()).getLevelData();
+        double rated = PointObject.INSTANCE.getExpRate(data.getPointInt()) * exp;
+        data.setExp(data.getExp()+(int)rated);
         player.playSound(player.getLocation(),Sound.ENTITY_EXPERIENCE_ORB_PICKUP,1,1);
         levelCheck(player);
     }
 
     public static void levelCheck(Player player){
-        LevelData data = PlayerDataMain.getPlayerData(player.getUniqueId()).levelData;
-        int currentExp = data.exp;
-        int nextExp = Level.getNextExp(data.level);
-        if (data.level >= Level.getMaxLevel()){
+        LevelData data = PlayerDataObject.INSTANCE.getPlayerDataMap().get(player.getUniqueId()).getLevelData();
+        int currentExp = data.getExp();
+        int nextExp = LevelObject.INSTANCE.getNextExp(data.getLevel());
+        if (data.getLevel() >= LevelObject.INSTANCE.getMaxLevel()){
             return;
         }
         if (currentExp >= nextExp){
             //レベルアップ
-            data.exp = (currentExp - nextExp);
-            data.level++;
+            data.setExp(currentExp - nextExp);
+            data.setLevel(data.getLevel()+1);
 
             //エフェクト
             player.playSound(player.getLocation(), Sound.ENTITY_PLAYER_LEVELUP,1,1);
             player.setHealth(Objects.requireNonNull(player.getAttribute(Attribute.GENERIC_MAX_HEALTH)).getValue());
-            data.rawPoint++;
+            data.setRawPoint(data.getRawPoint()+1);
 
             //さらなるレベルアップ判定
             addExp(player,0);
@@ -105,7 +111,7 @@ public class LevelMain {
     }
 
     public static void setMaxHpSt(Player player){
-        PlayerData data = PlayerDataMain.getPlayerData(player.getUniqueId());
+        PlayerData data = PlayerDataObject.INSTANCE.getPlayerDataMap().get(player.getUniqueId());
 
         if (data == null){
             //Bukkit.getLogger().info("[DiveCore-Level]データ待ち - "+player.getDisplayName());
@@ -114,27 +120,27 @@ public class LevelMain {
             });
             return;
         }
-        double plusHp = Point.getHealth(data.levelData.pointVit);
-        double plusSt = Point.getStamina(data.levelData.pointVit);
+        double plusHp = PointObject.INSTANCE.getHealth(data.getLevelData().getPointVit());
+        double plusSt = PointObject.INSTANCE.getStamina(data.getLevelData().getPointVit());
         AttributeInstance currentMax = player.getAttribute(Attribute.GENERIC_MAX_HEALTH);
         if(Objects.isNull(currentMax)){
             return;
         }
 
         // ログを出して検証
-        Bukkit.getLogger().info("["+player.getDisplayName()+"-vit"+data.levelData.pointVit+"] set hp "+(20.0+plusHp)+" stamina "+(100.0 + plusSt));
+        Bukkit.getLogger().info("["+player.getDisplayName()+"-vit"+data.getLevelData().getPointVit()+"] set hp "+(20.0+plusHp)+" stamina "+(100.0 + plusSt));
         currentMax.setBaseValue(20.0 + plusHp);
-        data.maxST = (int) (100.0 + plusSt);
+        data.setMaxST((int) (100.0 + plusSt));
     }
 
     public static void display(Player player){
-        if (PlayerDataMain.getPlayerData(player.getUniqueId()) == null){
+        if (PlayerDataObject.INSTANCE.getPlayerDataMap().get(player.getUniqueId()) == null){
             return;
         }
-        LevelData data = PlayerDataMain.getPlayerData(player.getUniqueId()).levelData;
-        int currentLevel = data.level;
-        float currentExp = data.exp;
-        float nextExp = Level.getNextExp(currentLevel);
+        LevelData data = PlayerDataObject.INSTANCE.getPlayerDataMap().get(player.getUniqueId()).getLevelData();
+        int currentLevel = data.getLevel();
+        float currentExp = data.getExp();
+        float nextExp = LevelObject.INSTANCE.getNextExp(currentLevel);
 
         float progress = currentExp / nextExp;
         if (progress < 0){
@@ -145,10 +151,6 @@ public class LevelMain {
         }
         player.setLevel(currentLevel);
         player.setExp(progress);
-    }
-
-    public static void putLayerExp(String layerID, int exp){
-        layerExpMap.put(layerID,exp);
     }
 
     public static void putGapRate(int gap, double rate){

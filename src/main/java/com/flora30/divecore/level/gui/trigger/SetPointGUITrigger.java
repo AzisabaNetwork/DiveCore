@@ -1,13 +1,12 @@
 package com.flora30.divecore.level.gui.trigger;
 
-import com.flora30.diveapi.data.player.LevelData;
+import com.flora30.diveapin.data.player.LevelData;
+import com.flora30.diveapin.data.player.PlayerDataObject;
 import com.flora30.divecore.DiveCore;
-import com.flora30.divecore.data.PlayerDataMain;
 import com.flora30.divecore.level.LevelMain;
-import com.flora30.divecore.level.Point;
-import com.flora30.divecore.level.PointData;
 import com.flora30.divecore.level.gui.SetPointGUI;
-import com.flora30.divecore.level.type.PointType;
+import com.flora30.divenew.data.PointObject;
+import com.flora30.divenew.data.PointType;
 import org.bukkit.Material;
 import org.bukkit.Sound;
 import org.bukkit.entity.Player;
@@ -41,60 +40,60 @@ public class SetPointGUITrigger {
     }
 
     private static void addPoint(Player player, Inventory gui, PointType type){
-        LevelData data = PlayerDataMain.getPlayerData(player.getUniqueId()).levelData;
+        LevelData data = PlayerDataObject.INSTANCE.getPlayerDataMap().get(player.getUniqueId()).getLevelData();
         Material glass;
 
 
         // 条件確認
-        if (data.rawPoint == 0){
+        if (data.getRawPoint() == 0){
             player.sendMessage("ポイントが不足しています");
             return;
         }
         switch (type) {
             case Luc -> {
-                if ( Point.lucApplyMap.get(data.pointLuc + 1) == null) return;
+                if ( PointObject.INSTANCE.getLucApplyMap().get(data.getPointLuc() + 1) == null) return;
             }
             case Int -> {
-                if ( Point.intApplyMap.get(data.pointInt + 1) == null) return;
+                if ( PointObject.INSTANCE.getIntApplyMap().get(data.getPointInt() + 1) == null) return;
             }
             case Vit -> {
-                if ( Point.vitApplyMap.get(data.pointVit + 1) == null) return;
+                if ( PointObject.INSTANCE.getVitApplyMap().get(data.getPointVit() + 1) == null) return;
             }
             case Atk -> {
-                if ( Point.atkApplyMap.get(data.pointAtk + 1) == null) return;
+                if ( PointObject.INSTANCE.getAtkApplyMap().get(data.getPointAtk() + 1) == null) return;
             }
         }
 
         // 使用可能なポイントを減らす
-        data.rawPoint--;
-        gui.setItem(4,SetPointGUI.getCurrentPoint(data.rawPoint));
+        data.setRawPoint(data.getRawPoint()-1);
+        gui.setItem(4,SetPointGUI.getCurrentPoint(data.getRawPoint()));
         player.playSound(player.getLocation(), Sound.BLOCK_BEACON_POWER_SELECT,1,1);
 
         // ポイント適用
         switch (type) {
             case Luc -> {
-                data.addPointLuc();
-                gui.setItem(25,SetPointGUI.getIconLuc(data.pointLuc));
-                gui.setItem(34,SetPointGUI.getIconLucPlus(data.pointLuc));
+                data.setPointLuc(data.getPointLuc()+1);
+                gui.setItem(25,SetPointGUI.getIconLuc(data.getPointLuc()));
+                gui.setItem(34,SetPointGUI.getIconLucPlus(data.getPointLuc()));
                 glass = Material.GREEN_STAINED_GLASS_PANE;
             }
             case Int -> {
-                data.addPointInt();
-                gui.setItem(23,SetPointGUI.getIconInt(data.pointInt));
-                gui.setItem(32,SetPointGUI.getIconIntPlus(data.pointInt));
+                data.setPointInt(data.getPointInt()+1);
+                gui.setItem(23,SetPointGUI.getIconInt(data.getPointInt()));
+                gui.setItem(32,SetPointGUI.getIconIntPlus(data.getPointInt()));
                 glass = Material.BLUE_STAINED_GLASS_PANE;
             }
             case Vit -> {
-                data.addPointVit();
+                data.setPointVit(data.getPointVit()+1);
                 LevelMain.setMaxHpSt(player);
-                gui.setItem(21,SetPointGUI.getIconVit(data.pointVit));
-                gui.setItem(30,SetPointGUI.getIconVitPlus(data.pointVit));
+                gui.setItem(21,SetPointGUI.getIconVit(data.getPointVit()));
+                gui.setItem(30,SetPointGUI.getIconVitPlus(data.getPointVit()));
                 glass = Material.ORANGE_STAINED_GLASS_PANE;
             }
             case Atk -> {
-                data.addPointAtk();
-                gui.setItem(19,SetPointGUI.getIconAtk(data.pointAtk));
-                gui.setItem(28,SetPointGUI.getIconAtkPlus(data.pointAtk));
+                data.setPointAtk(data.getPointAtk()+1);
+                gui.setItem(19,SetPointGUI.getIconAtk(data.getPointAtk()));
+                gui.setItem(28,SetPointGUI.getIconAtkPlus(data.getPointAtk()));
                 glass = Material.RED_STAINED_GLASS_PANE;
             }
             default -> throw new IllegalStateException("Unexpected value: " + type);
@@ -111,16 +110,17 @@ public class SetPointGUITrigger {
         //演出
         for (int i = 0; i < gui.getSize(); i++) {
             // 背景以外は除外
-            switch (i){
-                case 4,19,21,23,25,28,30,32,34,44:
+            switch (i) {
+                case 4, 19, 21, 23, 25, 28, 30, 32, 34, 44 -> {
                     continue;
+                }
             }
 
             ItemStack item = gui.getItem(i);
             if (item == null) continue;
             item.setType(glass);
         }
-        DiveCore.plugin.delayedTask(2,() -> onAnim(player, data.rawPoint));
+        DiveCore.plugin.delayedTask(2,() -> onAnim(player, data.getRawPoint()));
     }
 
     /**
@@ -132,7 +132,7 @@ public class SetPointGUITrigger {
         if (!player.getOpenInventory().getTitle().equals("ステータス強化")) return;
 
         // 演出中にポイントを振っていない？
-        if (PlayerDataMain.getPlayerData(player.getUniqueId()).levelData.rawPoint != rawPoint) return;
+        if (PlayerDataObject.INSTANCE.getPlayerDataMap().get(player.getUniqueId()).getLevelData().getRawPoint() != rawPoint) return;
 
         // 演出の進行度を取得する
         int count;
@@ -156,9 +156,10 @@ public class SetPointGUITrigger {
         // 演出を行う
         for (int i = 0; i < 9; i++) {
             // 背景以外は除外
-            switch (count * 9 + i){
-                case 4,19,21,23,25,28,30,32,34,44:
+            switch (count * 9 + i) {
+                case 4, 19, 21, 23, 25, 28, 30, 32, 34, 44 -> {
                     continue;
+                }
             }
 
             ItemStack item = gui.getItem(count * 9 + i);
@@ -171,6 +172,6 @@ public class SetPointGUITrigger {
         countItem.setItemMeta(countMeta);
 
         // 次の演出
-        DiveCore.plugin.delayedTask(2,() -> onAnim(player, PlayerDataMain.getPlayerData(player.getUniqueId()).levelData.rawPoint));
+        DiveCore.plugin.delayedTask(2,() -> onAnim(player, PlayerDataObject.INSTANCE.getPlayerDataMap().get(player.getUniqueId()).getLevelData().getRawPoint()));
     }
 }
