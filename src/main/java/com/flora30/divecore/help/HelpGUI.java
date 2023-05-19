@@ -1,9 +1,11 @@
 package com.flora30.divecore.help;
 
-import com.flora30.diveapi.data.PlayerData;
-import com.flora30.diveapi.tools.GuiItem;
-import com.flora30.divecore.data.PlayerDataMain;
+import com.flora30.diveapin.data.player.PlayerData;
+import com.flora30.diveapin.data.player.PlayerDataObject;
+import com.flora30.diveapin.util.GuiItem;
 import com.flora30.divecore.menu.MenuMain;
+import com.flora30.divenew.data.Help;
+import com.flora30.divenew.data.HelpObject;
 import org.bukkit.Bukkit;
 import org.bukkit.Sound;
 import org.bukkit.entity.Player;
@@ -14,20 +16,20 @@ public class HelpGUI {
     public static Inventory getGui(Player player){
 
         Inventory inv = Bukkit.createInventory(null,45,"ヘルプ一覧");
-        GuiItem.grayBack(inv);
+        GuiItem.INSTANCE.grayBack(inv);
 
-        PlayerData data = PlayerDataMain.getPlayerData(player.getUniqueId());
+        PlayerData data = PlayerDataObject.INSTANCE.getPlayerDataMap().get(player.getUniqueId());
         if (data == null){
             return inv;
         }
 
         int i = 9;
-        for (int helpId : HelpMain.helpMap.keySet()){
-            if (!data.helpIdSet.contains(helpId)){
+        for (int helpId : HelpObject.INSTANCE.getHelpMap().keySet()){
+            if (!data.getHelpIdSet().contains(helpId)){
                 continue;
             }
 
-            Help help = HelpMain.helpMap.get(helpId);
+            Help help = HelpObject.INSTANCE.getHelpMap().get(helpId);
             inv.setItem(i,help.getItem());
             i++;
 
@@ -36,7 +38,7 @@ public class HelpGUI {
             }
         }
 
-        inv.setItem(44,GuiItem.getReturn());
+        inv.setItem(44,GuiItem.INSTANCE.getReturn());
 
         return inv;
     }

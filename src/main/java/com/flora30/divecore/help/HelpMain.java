@@ -1,9 +1,11 @@
 package com.flora30.divecore.help;
 
-import com.flora30.diveapi.data.PlayerData;
-import com.flora30.diveapi.event.HelpEvent;
-import com.flora30.diveapi.tools.HelpType;
-import com.flora30.divecore.data.PlayerDataMain;
+import com.flora30.diveapin.data.player.PlayerData;
+import com.flora30.diveapin.data.player.PlayerDataObject;
+import com.flora30.diveapin.event.HelpEvent;
+import com.flora30.diveapin.event.HelpType;
+import com.flora30.divenew.data.Help;
+import com.flora30.divenew.data.HelpObject;
 import org.bukkit.Bukkit;
 import org.bukkit.ChatColor;
 import org.bukkit.Sound;
@@ -13,32 +15,33 @@ import java.util.HashMap;
 import java.util.Map;
 
 public class HelpMain {
-    public static Map<Integer,Help> helpMap = new HashMap<>();
 
+    // こっちは直接追加用
     public static void addHelp(Player player, int id){
-        PlayerData data = PlayerDataMain.getPlayerData(player.getUniqueId());
-        if (!helpMap.containsKey(id)){
+        PlayerData data = PlayerDataObject.INSTANCE.getPlayerDataMap().get(player.getUniqueId());
+        if (!HelpObject.INSTANCE.getHelpMap().containsKey(id)){
             return;
         }
 
-        data.helpIdSet.add(id);
+        data.getHelpIdSet().add(id);
         player.playSound(player.getLocation(), Sound.ENTITY_VILLAGER_TRADE,1,1);
-        player.sendMessage(ChatColor.GREEN+"ヘルプ「"+helpMap.get(id).getTitle()+ChatColor.GREEN+"」を獲得しました");
+        player.sendMessage(ChatColor.GREEN+"ヘルプ「"+HelpObject.INSTANCE.getHelpMap().get(id).getTitle()+ChatColor.GREEN+"」を獲得しました");
     }
 
+
     public static void openGUI(Player player){
-        Bukkit.getPluginManager().callEvent(new HelpEvent(player,HelpType.HelpGUI));
+        Bukkit.getPluginManager().callEvent(new HelpEvent(player, HelpType.HelpGUI));
         player.openInventory(HelpGUI.getGui(player));
     }
 
     public static void onHelpTrigger(HelpEvent e) {
-        PlayerData data = PlayerDataMain.getPlayerData(e.getPlayer().getUniqueId());
-        for (int key : helpMap.keySet()) {
-            if (data.helpIdSet.contains(key)) continue;
-            Help help = helpMap.get(key);
+        PlayerData data = PlayerDataObject.INSTANCE.getPlayerDataMap().get(e.getPlayer().getUniqueId());
+        for (int key : HelpObject.INSTANCE.getHelpMap().keySet()) {
+            if (data.getHelpIdSet().contains(key)) continue;
+            Help help = HelpObject.INSTANCE.getHelpMap().get(key);
 
-            if (help.trigger == e.getType()) {
-                data.helpIdSet.add(key);
+            if (help.getTrigger() == e.getType()) {
+                data.getHelpIdSet().add(key);
                 e.getPlayer().playSound(e.getPlayer().getLocation(), Sound.ENTITY_VILLAGER_TRADE,1,1);
                 e.getPlayer().sendMessage(ChatColor.GREEN+"ヘルプ「"+help.getTitle()+ChatColor.GREEN+"」を獲得しました");
             }

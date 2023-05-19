@@ -1,8 +1,10 @@
 package com.flora30.divecore.help;
 
-import com.flora30.diveapi.tools.HelpType;
+import com.flora30.diveapin.event.HelpType;
 import com.flora30.divecore.DiveCore;
 import com.flora30.divecore.tools.Config;
+import com.flora30.divenew.data.Help;
+import com.flora30.divenew.data.HelpObject;
 import org.bukkit.Bukkit;
 import org.bukkit.ChatColor;
 import org.bukkit.Material;
@@ -46,7 +48,7 @@ public class HelpConfig extends Config {
 
                 try{
                     trigger = HelpType.valueOf(file2.getString(key+".trigger"));
-                } catch (IllegalArgumentException e) {
+                } catch (IllegalArgumentException|NullPointerException e) {
                     Bukkit.getLogger().info("[DiveCore-Help]条件の取得に失敗しました("+file2.getName()+", "+key+")");
                     continue;
                 }
@@ -58,21 +60,15 @@ public class HelpConfig extends Config {
                 try{
                     title = replaceColorCode(loadOrDefault("help", file2, key + ".title", ""));
                     lore = file2.getStringList(key + ".lore");
-                    for (int i = 0; i < lore.size(); i++) {
-                        lore.set(i, replaceColorCode(lore.get(i)));
-                    }
+                    lore.replaceAll(this::replaceColorCode);
                 } catch (IllegalArgumentException e){
                     Bukkit.getLogger().info("[DiveCore-Help]色の取得に失敗しました("+file2.getName()+", "+key+")");
                     continue;
                 }
 
-                Help help = new Help();
-                help.setMaterial(material);
-                help.setTitle(title);
-                help.setLore(lore);
-                help.trigger = trigger;
+                Help help = new Help(trigger,material,title,lore);
 
-                HelpMain.helpMap.put(helpID,help);
+                HelpObject.INSTANCE.getHelpMap().put(helpID,help);
                 Bukkit.getLogger().info("[DiveCore-Help]「"+helpID+"」をロードしました");
             }
         }
