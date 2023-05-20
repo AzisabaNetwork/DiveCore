@@ -1,7 +1,7 @@
 package com.flora30.divecore.mechanic;
 
-import com.flora30.diveapi.plugins.ItemAPI;
-import com.flora30.diveapi.tools.BlockLoc;
+import com.flora30.diveapin.BlockLoc;
+import com.flora30.diveapin.LightObject;
 import org.bukkit.Bukkit;
 import org.bukkit.Location;
 import org.bukkit.Material;
@@ -12,19 +12,18 @@ import java.util.*;
 
 public class Light {
 
-    public static final Map<BlockLoc,Integer> lightLocations = new HashMap<>();
-    public static final Set<BlockLoc> waters = new HashSet<>();
-
     public static void lightStop(){
         for (Player player : Bukkit.getOnlinePlayers()){
-            for (BlockLoc before : lightLocations.keySet()){
+            for (BlockLoc before : LightObject.INSTANCE.getLightLocations().keySet()){
                 player.sendBlockChange(before.getLocation(),before.getBlock().getBlockData());
             }
         }
-        lightLocations.clear();
+        LightObject.INSTANCE.getLightLocations().clear();
     }
 
     public static void lightCheck(){
+        Map<BlockLoc,Integer> lightLocations = LightObject.INSTANCE.getLightLocations();
+
         long time = System.currentTimeMillis();
 
         // 今プレイヤーが見てる光の座標を追加
@@ -39,7 +38,7 @@ public class Light {
                 try{
                     for (BlockLoc after : lightLocations.keySet()) {
                         org.bukkit.block.data.type.Light data = (org.bukkit.block.data.type.Light) Material.LIGHT.createBlockData();
-                        if (waters.contains(after)) {
+                        if (LightObject.INSTANCE.getWaters().contains(after)) {
                             data.setWaterlogged(true);
                         }
                         player.sendBlockChange(after.getLocation(),data);
@@ -92,7 +91,7 @@ public class Light {
         Location lightLocation = getLightAbleLocation(player, player.getLocation().add(0,1,0));
 
         if (lightLocation != null) {
-            lightLocations.put(new BlockLoc(lightLocation), 0);
+            LightObject.INSTANCE.getLightLocations().put(new BlockLoc(lightLocation), 0);
         }
 
         if (player.getInventory().getHelmet() != null){
@@ -116,7 +115,7 @@ public class Light {
                 Location newLoc = getLightAbleLocation(player, lightLocation.clone());
 
                 if (newLoc != null) {
-                    lightLocations.put(new BlockLoc(newLoc), 0);
+                    LightObject.INSTANCE.getLightLocations().put(new BlockLoc(newLoc), 0);
                 }
 
                 count++;
@@ -124,6 +123,10 @@ public class Light {
         } catch (IllegalArgumentException ignored) {}
     }
 
+    /**
+     * 光を置ける場所を探す
+     * xyz方向、各軸に+-1ずつ移動した6箇所で判定
+     */
     private static Location getLightAbleLocation(Player player, Location startLoc) {
         BlockLoc blockLoc = new BlockLoc(startLoc);
         if (isLightAble(player,blockLoc)) return blockLoc.getLocation();
@@ -145,7 +148,7 @@ public class Light {
         switch (loc.getBlock().getType()) {
             case AIR,CAVE_AIR,VOID_AIR -> {}
             case WATER,SEAGRASS,TALL_SEAGRASS -> {
-                waters.add(new BlockLoc(loc.getLocation()));
+                LightObject.INSTANCE.getWaters().add(new BlockLoc(loc.getLocation()));
             }
             default -> {
                 return false;

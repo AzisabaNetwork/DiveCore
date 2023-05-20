@@ -1,6 +1,6 @@
 package com.flora30.divecore;
 
-import com.flora30.diveapi.DiveAPI;
+import com.flora30.diveapin.Ready;
 import com.flora30.divecore.tools.ClearTrigger;
 import com.flora30.divecore.display.SideBar;
 import com.flora30.divecore.mechanic.Light;
@@ -55,7 +55,7 @@ public final class DiveCore extends JavaPlugin {
 
         getServer().getPluginManager().registerEvents(listeners, this);
         getServer().getPluginManager().registerEvents(new ClearTrigger(),this);
-        DiveAPI.coreEventReady = true;
+        Ready.INSTANCE.setCoreEventReady(true);
 
         //セーブ系Mainで全機能のロードを行う
         ConfigMain configMain = new ConfigMain();

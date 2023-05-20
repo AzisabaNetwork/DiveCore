@@ -1,17 +1,15 @@
 package com.flora30.divecore.menu;
 
-import com.flora30.diveapi.data.PlayerData;
-import com.flora30.diveapi.data.Story;
-import com.flora30.diveapi.data.Whistle;
-import com.flora30.diveapi.event.HelpEvent;
-import com.flora30.diveapi.plugins.CoreAPI;
-import com.flora30.diveapi.plugins.ItemAPI;
-import com.flora30.diveapi.plugins.QuestAPI;
-import com.flora30.diveapi.plugins.RegionAPI;
-import com.flora30.diveapi.tools.GuiItem;
-import com.flora30.diveapi.tools.GuiItemType;
-import com.flora30.diveapi.tools.HelpType;
+import com.flora30.diveapin.data.player.PlayerData;
+import com.flora30.diveapin.data.player.PlayerDataObject;
+import com.flora30.diveapin.event.HelpEvent;
+import com.flora30.diveapin.event.HelpType;
+import com.flora30.diveapin.util.GuiItem;
+import com.flora30.diveapin.util.GuiItemType;
 import com.flora30.divecore.data.PlayerDataMain;
+import com.flora30.divenew.data.LayerObject;
+import com.flora30.divenew.data.Whistle;
+import com.flora30.divenew.data.WhistleObject;
 import org.bukkit.Bukkit;
 import org.bukkit.ChatColor;
 import org.bukkit.Material;
@@ -27,11 +25,11 @@ import java.util.List;
 public class MenuGUI {
     public static Inventory getGui(Player player){
         Inventory inv = Bukkit.createInventory(null,45,"メニュー");
-        GuiItem.grayBack(inv);
-        String name = QuestAPI.getStory(CoreAPI.getPlayerData(player.getUniqueId()).layerData.layer).displayName;
+        GuiItem.INSTANCE.grayBack(inv);
+        String name = QuestAPI.getStory(PlayerDataObject.INSTANCE.getPlayerDataMap().get(player.getUniqueId()).getLayerData().getLayer()).displayName;
         inv.setItem(4,getTitled(new ItemStack(Material.GRASS_BLOCK),ChatColor.GOLD+"エリア ‣ " +ChatColor.WHITE+ name));
 
-        inv.setItem(10,getTitled(GuiItem.getItem(GuiItemType.Point),ChatColor.GOLD+"現在のステータスを確認する"));
+        inv.setItem(10,getTitled(GuiItem.INSTANCE.getItem(GuiItemType.Point),ChatColor.GOLD+"現在のステータスを確認する"));
 
         inv.setItem(12,getTitled(new ItemStack(Material.CRAFTING_TABLE),ChatColor.GOLD+"クラフトをする"));
 
@@ -39,7 +37,7 @@ public class MenuGUI {
 
         inv.setItem(16,getReturn(player));
 
-        inv.setItem(28,getTitled(GuiItem.getItem(GuiItemType.Help),ChatColor.GOLD+"ヘルプを見る"));
+        inv.setItem(28,getTitled(GuiItem.INSTANCE.getItem(GuiItemType.Help),ChatColor.GOLD+"ヘルプを見る"));
 
         inv.setItem(34,DeathGUI.getDeathIcon());
 
@@ -56,14 +54,14 @@ public class MenuGUI {
     }
 
     private static ItemStack getReturn(Player player) {
-        ItemStack icon = com.flora30.diveapi.tools.GuiItem.getReturn();
+        ItemStack icon = GuiItem.INSTANCE.getReturn();
         ItemMeta meta = icon.getItemMeta();
         assert meta != null;
         meta.setDisplayName(ChatColor.GOLD + "オースに帰還する");
 
         // オースの場合は不要
-        PlayerData data = PlayerDataMain.getPlayerData(player.getUniqueId());
-        if (data.layerData.layer.equals("oldOrth")){
+        PlayerData data = PlayerDataObject.INSTANCE.getPlayerDataMap().get(player.getUniqueId());
+        if (data.getLayerData().getLayer().equals("oldOrth")){
             icon.setType(Material.BARRIER);
             List<String> lore = new ArrayList<>();
             lore.add(ChatColor.WHITE + "探窟中にのみ使用可能です");
@@ -73,12 +71,12 @@ public class MenuGUI {
         }
 
         // 条件を確認
-        Whistle whistle = ItemAPI.getWhistle(data.levelData.whistleRank);
-        int returnDepth = whistle.returnDepth;
+        Whistle whistle = WhistleObject.INSTANCE.getWhistleMap().get(data.getLevelData().getWhistleRank());
+        int returnDepth = whistle.getReturnDepth();
 
         //　現在の深さを確認
         double fallPlus = 200 - player.getLocation().getY();
-        double fallLayer = RegionAPI.getLayer(data.layerData.layer).fall;
+        double fallLayer = LayerObject.INSTANCE.getLayerMap().get(data.getLayerData().getLayer()).getFall();
         int fall = (int) (fallPlus+fallLayer);
 
         // Loreを設定
@@ -109,8 +107,8 @@ public class MenuGUI {
         meta.addItemFlags(ItemFlag.HIDE_ATTRIBUTES);
 
         // ファストトラベルが使えない場合
-        PlayerData data = PlayerDataMain.getPlayerData(player.getUniqueId());
-        if (data == null || !RegionAPI.canFastTravel(data.layerData.layer)) {
+        PlayerData data = PlayerDataObject.INSTANCE.getPlayerDataMap().get(player.getUniqueId());
+        if (data == null || !RegionAPI.canFastTravel(data.getLayerData().getLayer())) {
             icon.setType(Material.BARRIER);
             List<String> lore = new ArrayList<>();
             lore.add("");

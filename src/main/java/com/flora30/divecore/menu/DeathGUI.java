@@ -1,9 +1,6 @@
 package com.flora30.divecore.menu;
 
-import com.flora30.diveapi.plugins.CoreAPI;
-import com.flora30.diveapi.plugins.QuestAPI;
-import com.flora30.diveapi.tools.GuiItem;
-import com.flora30.diveapi.tools.GuiItemType;
+import com.flora30.diveapin.util.GuiItem;
 import com.flora30.divecore.tools.SoundUtil;
 import com.flora30.divecore.tools.type.DiveSound;
 import org.bukkit.Bukkit;
@@ -21,7 +18,7 @@ import java.util.List;
 public class DeathGUI {
     public static Inventory getGui(){
         Inventory inv = Bukkit.createInventory(null,27,"死亡する？");
-        GuiItem.grayBack(inv);
+        GuiItem.INSTANCE.grayBack(inv);
         inv.setItem(4,getDeathIcon());
 
         inv.setItem(11,getTrueIcon());

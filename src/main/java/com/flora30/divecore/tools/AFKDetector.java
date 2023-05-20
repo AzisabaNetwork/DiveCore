@@ -1,6 +1,7 @@
 package com.flora30.divecore.tools;
 
-import com.flora30.diveapi.data.PlayerData;
+import com.flora30.diveapin.data.player.PlayerData;
+import com.flora30.diveapin.data.player.PlayerDataObject;
 import com.flora30.divecore.DiveCore;
 import com.flora30.divecore.data.PlayerDataMain;
 import com.google.common.io.ByteArrayDataOutput;
@@ -19,35 +20,35 @@ public class AFKDetector {
     // 1分に1回走る
     public static void on1200Tick() {
         for (Player player : Bukkit.getOnlinePlayers()) {
-            PlayerData data = PlayerDataMain.getPlayerData(player.getUniqueId());
+            PlayerData data = PlayerDataObject.INSTANCE.getPlayerDataMap().get(player.getUniqueId());
             if (data == null) continue;
 
-            if (data.afkLocation == null) {
-                data.afkLocation = player.getLocation().clone();
+            if (data.getAfkLocation() == null) {
+                data.setAfkLocation(player.getLocation().clone());
                 continue;
             }
-            if (data.afkLocation.getWorld() != player.getWorld()) {
-                data.afkLocation = player.getLocation().clone();
+            if (data.getAfkLocation().getWorld() != player.getWorld()) {
+                data.setAfkLocation(player.getLocation().clone());
                 continue;
             }
             // AFK判定（成功するとポイント）
-            if (data.afkLocation.distance(player.getLocation()) > 1) {
-                data.afkLocation = player.getLocation().clone();
+            if (data.getAfkLocation().distance(player.getLocation()) > 1) {
+                data.setAfkLocation(player.getLocation().clone());
                 continue;
             }
 
 
-            data.afkTime += 1;
-            Bukkit.getLogger().info("[AFK]"+player.getDisplayName()+"のAFKポイント -> " + data.afkTime);
+            data.setAfkTime(data.getAfkTime()+1);
+            Bukkit.getLogger().info("[AFK]"+player.getDisplayName()+"のAFKポイント -> " + data.getAfkTime());
 
             // メッセージ表示
-            if (messageTimes.contains(data.afkTime)) {
-                player.sendMessage(ChatColor.GRAY + "現在AFK状態です。動くと解除されます。（AFK鯖への移動まで残り"+(15-data.afkTime)+"分）");
+            if (messageTimes.contains(data.getAfkTime())) {
+                player.sendMessage(ChatColor.GRAY + "現在AFK状態です。動くと解除されます。（AFK鯖への移動まで残り"+(15-data.getAfkTime())+"分）");
                 player.playSound(player.getLocation(), Sound.UI_BUTTON_CLICK,1,1);
             }
 
             // 条件を満たしたとき
-            if (data.afkTime >= 15) {
+            if (data.getAfkTime() >= 15) {
                 // afk鯖に送る
                 ByteArrayDataOutput out = ByteStreams.newDataOutput();
                 out.writeUTF("Connect");
@@ -58,11 +59,11 @@ public class AFKDetector {
     }
 
     public static void onMove(PlayerMoveEvent e) {
-        PlayerData data = PlayerDataMain.getPlayerData(e.getPlayer().getUniqueId());
+        PlayerData data = PlayerDataObject.INSTANCE.getPlayerDataMap().get(e.getPlayer().getUniqueId());
 
-        if (data.afkTime >= 5) {
+        if (data.getAfkTime() >= 5) {
             e.getPlayer().sendMessage(ChatColor.GRAY + "AFK状態を解除しました");
         }
-        data.afkTime = 0;
+        data.setAfkTime(0);
     }
 }

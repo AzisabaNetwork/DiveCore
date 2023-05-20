@@ -1,7 +1,6 @@
 package com.flora30.divecore.menu;
 
-import com.flora30.diveapi.tools.PlayerItem;
-import org.bukkit.Bukkit;
+import com.flora30.diveapin.util.PlayerItem;
 import org.bukkit.Material;
 import org.bukkit.entity.Player;
 import org.bukkit.event.block.Action;
@@ -50,7 +49,7 @@ public class MenuTrigger {
                     // 他のアイテムがある場合は、コンパスを置いた後であげ直す
                     ItemStack other = item.clone();
                     inventory.setItem(i,MenuMain.menuIcon);
-                    PlayerItem.giveItem(player, other);
+                    PlayerItem.INSTANCE.giveItem(player, other);
                 }
                 continue;
             }

@@ -1,7 +1,7 @@
 package com.flora30.divecore.menu;
 
-import com.flora30.diveapi.event.HelpEvent;
-import com.flora30.diveapi.tools.HelpType;
+import com.flora30.diveapin.event.HelpEvent;
+import com.flora30.diveapin.event.HelpType;
 import org.bukkit.Bukkit;
 import org.bukkit.ChatColor;
 import org.bukkit.Material;
