@@ -1,8 +1,9 @@
 package com.flora30.divecore;
 
-import com.flora30.divelib.event.HelpEvent;
-import com.flora30.divelib.event.LayerChangeEvent;
-import com.flora30.divelib.event.LayerLoadEvent;
+import com.flora30.divecore.api.event.tutorial.PointLookEvent;
+import com.flora30.divecore.level.gui.StatusGUI;
+import com.flora30.divelib.data.MenuSlot;
+import com.flora30.divelib.event.*;
 import com.flora30.divecore.api.event.RegisterSideBarEvent;
 import com.flora30.divecore.base.BaseTrigger;
 import com.flora30.divecore.base.gui.EnderChestGUI;
@@ -21,6 +22,8 @@ import com.flora30.divecore.menu.MenuTrigger;
 import com.flora30.divecore.tools.AFKDetector;
 import com.flora30.divecore.tools.deprecated.Slide;
 import com.flora30.divecore.level.LevelTrigger;
+import com.flora30.divelib.util.GuiItem;
+import com.flora30.divelib.util.GuiItemType;
 import io.lumine.xikage.mythicmobs.api.bukkit.events.MythicMobDeathEvent;
 import org.bukkit.Bukkit;
 import org.bukkit.ChatColor;
@@ -45,6 +48,8 @@ import org.bukkit.event.inventory.InventoryCloseEvent;
 import org.bukkit.event.inventory.InventoryDragEvent;
 import org.bukkit.event.inventory.InventoryMoveItemEvent;
 import org.bukkit.event.player.*;
+import org.bukkit.inventory.ItemStack;
+import org.bukkit.inventory.meta.ItemMeta;
 import org.jetbrains.annotations.NotNull;
 
 import java.util.Collection;
@@ -287,6 +292,46 @@ public class Listeners implements Listener, CommandExecutor {
     public void onDamage(EntityDamageEvent e){
         DisplayTrigger.onFall(e);
     }
+
+    @EventHandler
+    public void onMenuOpen(MenuOpenEvent e){
+        // ステータス確認
+        ItemStack icon1 = GuiItem.INSTANCE.getItem(GuiItemType.Point);
+        ItemMeta meta1 = icon1.getItemMeta();
+        meta1.setDisplayName(ChatColor.GOLD + "現在のステータスを確認する");
+        icon1.setItemMeta(meta1);
+        e.getIconMap().put(MenuSlot.Slot1, icon1);
+
+        // ヘルプ
+        ItemStack icon2 = GuiItem.INSTANCE.getItem(GuiItemType.Help);
+        ItemMeta meta2 = icon2.getItemMeta();
+        meta2.setDisplayName(ChatColor.GOLD+"ヘルプを見る");
+        icon2.setItemMeta(meta2);
+        e.getIconMap().put(MenuSlot.Slot5, icon2);
+
+        // 死亡確認
+        e.getIconMap().put(MenuSlot.Slot8, DeathGUI.getDeathIcon());
+    }
+
+    @EventHandler
+    public void onMenuClick(MenuClickEvent e){
+        switch (e.getSlot()){
+            // ステータスGUIを開く
+            case Slot1 -> {
+                StatusGUI.open(e.getPlayer());
+                Listeners.callEvent(new PointLookEvent(e.getPlayer()));
+            }
+            // ヘルプGUIを開く
+            case Slot5 -> {
+                HelpMain.openGUI(e.getPlayer());
+            }
+            // 死亡確認GUIを開く
+            case Slot8 -> {
+                e.getPlayer().openInventory(DeathGUI.getGui());
+            }
+        }
+    }
+
 
     public static int mechanicTick = 6;
     public static int levelTick = 2;

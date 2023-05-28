@@ -1,5 +1,7 @@
 package com.flora30.divecore.menu;
 
+import com.flora30.diveconstant.data.teleport.TravelObject;
+import com.flora30.divelib.data.MenuSlot;
 import com.flora30.divelib.data.player.PlayerData;
 import com.flora30.divelib.data.player.PlayerDataObject;
 import com.flora30.divelib.event.HelpEvent;
@@ -20,26 +22,30 @@ import org.bukkit.inventory.ItemStack;
 import org.bukkit.inventory.meta.ItemMeta;
 
 import java.util.ArrayList;
+import java.util.EnumMap;
 import java.util.List;
+import java.util.Map;
 
 public class MenuGUI {
+
+
     public static Inventory getGui(Player player){
         Inventory inv = Bukkit.createInventory(null,45,"メニュー");
         GuiItem.INSTANCE.grayBack(inv);
         String name = LayerObject.INSTANCE.getLayerMap().get(PlayerDataObject.INSTANCE.getPlayerDataMap().get(player.getUniqueId()).getLayerData().getLayer()).getDisplayName();
         inv.setItem(4,getTitled(new ItemStack(Material.GRASS_BLOCK),ChatColor.GOLD+"エリア ‣ " +ChatColor.WHITE+ name));
 
-        inv.setItem(10,getTitled(GuiItem.INSTANCE.getItem(GuiItemType.Point),ChatColor.GOLD+"現在のステータスを確認する"));
+        //fin inv.setItem(10,getTitled(GuiItem.INSTANCE.getItem(GuiItemType.Point),ChatColor.GOLD+"現在のステータスを確認する"));
 
-        inv.setItem(12,getTitled(new ItemStack(Material.CRAFTING_TABLE),ChatColor.GOLD+"クラフトをする"));
+        //fin inv.setItem(12,getTitled(new ItemStack(Material.CRAFTING_TABLE),ChatColor.GOLD+"クラフトをする"));
 
-        inv.setItem(14,getTravelIcon(player));
+        //fin inv.setItem(14,getTravelIcon(player));
 
         inv.setItem(16,getReturn(player));
 
-        inv.setItem(28,getTitled(GuiItem.INSTANCE.getItem(GuiItemType.Help),ChatColor.GOLD+"ヘルプを見る"));
+        //fin inv.setItem(28,getTitled(GuiItem.INSTANCE.getItem(GuiItemType.Help),ChatColor.GOLD+"ヘルプを見る"));
 
-        inv.setItem(34,DeathGUI.getDeathIcon());
+        //fin inv.setItem(34,DeathGUI.getDeathIcon());
 
         return inv;
     }
@@ -108,7 +114,7 @@ public class MenuGUI {
 
         // ファストトラベルが使えない場合
         PlayerData data = PlayerDataObject.INSTANCE.getPlayerDataMap().get(player.getUniqueId());
-        if (data == null || !RegionAPI.canFastTravel(data.getLayerData().getLayer())) {
+        if (data == null || !TravelObject.INSTANCE.getTravelMap().containsKey(data.getLayerData().getLayer())) {
             icon.setType(Material.BARRIER);
             List<String> lore = new ArrayList<>();
             lore.add("");

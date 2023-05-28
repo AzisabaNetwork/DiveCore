@@ -8,7 +8,6 @@ import com.flora30.divelib.ItemMain;
 import com.flora30.divelib.data.player.PlayerData;
 import com.flora30.divelib.data.player.PlayerDataObject;
 import com.flora30.divelib.event.LayerChangeEvent;
-import com.flora30.divelib.event.LayerLoadEvent;
 import com.flora30.divecore.DiveCore;
 import com.flora30.divecore.level.gui.SetPointGUI;
 import com.flora30.divecore.level.gui.StatusGUI;
@@ -196,4 +195,5 @@ public class LevelTrigger {
 
         data.setCurrentST(data.getMaxST());
     }
+
 }

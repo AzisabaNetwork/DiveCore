@@ -7,8 +7,10 @@ import org.bukkit.ChatColor;
 import org.bukkit.Material;
 import org.bukkit.Sound;
 import org.bukkit.entity.Player;
+import org.bukkit.event.inventory.InventoryClickEvent;
 import org.bukkit.inventory.ItemStack;
 import org.bukkit.inventory.meta.ItemMeta;
+import org.jetbrains.annotations.NotNull;
 
 public class MenuMain {
     public static ItemStack menuIcon;
@@ -23,6 +25,9 @@ public class MenuMain {
         menuIcon.setItemMeta(meta);
     }
 
+    /**
+     * コンパス検知
+     */
     public static boolean isMenuIcon(ItemStack item){
         if (item == null || item.getItemMeta() == null){
             return false;
@@ -40,4 +45,5 @@ public class MenuMain {
     public static ItemStack getMenuIcon(Player player){
         return player.getInventory().getItem(8);
     }
+
 }

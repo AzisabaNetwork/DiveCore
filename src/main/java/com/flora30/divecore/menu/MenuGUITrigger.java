@@ -1,20 +1,31 @@
 package com.flora30.divecore.menu;
 
-import com.flora30.diveapi.plugins.ItemAPI;
-import com.flora30.diveapi.plugins.RegionAPI;
 import com.flora30.divecore.Listeners;
-import com.flora30.divecore.api.event.tutorial.PointLookEvent;
-import com.flora30.divecore.help.HelpMain;
-import com.flora30.divecore.level.gui.StatusGUI;
 import com.flora30.divecore.tools.SoundUtil;
 import com.flora30.divecore.tools.type.DiveSound;
-import org.bukkit.Material;
+import com.flora30.divelib.data.MenuSlot;
+import com.flora30.divelib.event.MenuClickEvent;
 import org.bukkit.entity.Player;
 import org.bukkit.event.inventory.InventoryClickEvent;
-import org.bukkit.event.inventory.InventoryType;
-import org.bukkit.inventory.ItemStack;
+
+import java.util.HashMap;
+import java.util.Map;
 
 public class MenuGUITrigger {
+
+    static Map<Integer,MenuSlot> inventorySlots = getInventorySlots();
+    private static Map<Integer,MenuSlot> getInventorySlots(){
+        Map<Integer,MenuSlot> before =  new HashMap<>();
+        before.put(10,MenuSlot.Slot1);
+        before.put(12,MenuSlot.Slot2);
+        before.put(14,MenuSlot.Slot3);
+        before.put(16,MenuSlot.Slot4);
+        before.put(28,MenuSlot.Slot5);
+        before.put(30,MenuSlot.Slot6);
+        before.put(32,MenuSlot.Slot7);
+        before.put(34,MenuSlot.Slot8);
+        return before;
+    }
 
     // アイテムを持つ状況が発生しないのでDrag停止は必要なし
     public static void onClick(InventoryClickEvent event){
@@ -27,46 +38,11 @@ public class MenuGUITrigger {
         }
 
         Player player = (Player) event.getWhoClicked();
-
-        switch (event.getSlot()) {
-            case 10 -> {
+        if (inventorySlots.containsKey(event.getSlot())){
+            MenuClickEvent menuClickEvent = new MenuClickEvent(player,inventorySlots.get(event.getSlot()),event.getCurrentItem());
+            Listeners.callEvent(menuClickEvent);
+            if (menuClickEvent.getUseClickSound()){
                 SoundUtil.playSound(player, DiveSound.GuiClick, 1.0);
-                // ステータスGUIを開く
-                StatusGUI.open(player);
-                Listeners.callEvent(new PointLookEvent(player));
-            }
-            case 12 -> {
-                SoundUtil.playSound(player, DiveSound.GuiClick, 1.0);
-                player.openInventory(ItemAPI.getCraftListGui(player));
-            }
-
-            case 14 -> {
-                // ファストトラベル可能な場合は、MaterialがIRON_BOOTS
-                ItemStack icon = event.getClickedInventory().getItem(14);
-                if (icon == null) return;
-                if (icon.getType() == Material.IRON_BOOTS) {
-                    //クリック音
-                    SoundUtil.playSound(player, DiveSound.GuiClick, 1.0);
-                    RegionAPI.openTravelGUI(player);
-                }
-            }
-            case 16 -> {
-                // 帰還可能な場合は、MaterialがBarrierではない
-                ItemStack icon = event.getClickedInventory().getItem(16);
-                if (icon == null) return;
-                if (icon.getType() != Material.BARRIER) {
-                    //クリック音
-                    SoundUtil.playSound(player, DiveSound.GuiClick, 1.0);
-                    RegionAPI.returnTeleport(player);
-                }
-            }
-            case 28 -> {
-                SoundUtil.playSound(player, DiveSound.GuiClick, 1.0);
-                HelpMain.openGUI(player);
-            }
-            case 34 -> {
-                SoundUtil.playSound(player, DiveSound.GuiClick, 1.0);
-                player.openInventory(DeathGUI.getGui());
             }
         }
     }
