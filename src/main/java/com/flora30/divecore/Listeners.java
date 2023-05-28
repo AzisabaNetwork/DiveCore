@@ -1,6 +1,7 @@
 package com.flora30.divecore;
 
 import com.flora30.divecore.api.event.tutorial.PointLookEvent;
+import com.flora30.divecore.level.LevelMain;
 import com.flora30.divecore.level.gui.StatusGUI;
 import com.flora30.divelib.data.MenuSlot;
 import com.flora30.divelib.event.*;
@@ -291,6 +292,11 @@ public class Listeners implements Listener, CommandExecutor {
     @EventHandler
     public void onDamage(EntityDamageEvent e){
         DisplayTrigger.onFall(e);
+    }
+
+    @EventHandler
+    public void onAddExp(AddExpEvent e){
+        LevelMain.addExp(e.getPlayer(), e.getExp());
     }
 
     @EventHandler
