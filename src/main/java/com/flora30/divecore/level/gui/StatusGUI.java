@@ -1,10 +1,10 @@
 package com.flora30.divecore.level.gui;
 
-import com.flora30.diveapin.data.player.LevelData;
-import com.flora30.diveapin.data.player.PlayerDataObject;
-import com.flora30.diveapin.event.HelpEvent;
-import com.flora30.diveapin.event.HelpType;
-import com.flora30.diveapin.util.GuiItem;
+import com.flora30.divelib.data.player.LevelData;
+import com.flora30.divelib.data.player.PlayerDataObject;
+import com.flora30.divelib.event.HelpEvent;
+import com.flora30.divelib.event.HelpType;
+import com.flora30.divelib.util.GuiItem;
 import com.flora30.divecore.data.PlayerDataMain;
 import org.bukkit.Bukkit;
 import org.bukkit.entity.Player;

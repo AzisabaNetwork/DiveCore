@@ -1,7 +1,7 @@
 package com.flora30.divecore.base.gui.trigger;
 
-import com.flora30.diveapin.data.Base;
-import com.flora30.diveapin.data.BaseObject;
+import com.flora30.divelib.data.Base;
+import com.flora30.divelib.data.BaseObject;
 import com.flora30.divecore.base.gui.BaseGUI;
 import com.flora30.divecore.base.gui.BaseUpgradeGUI;
 import com.flora30.divecore.base.gui.EnderChestGUI;

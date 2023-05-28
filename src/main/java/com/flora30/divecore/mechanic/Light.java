@@ -1,7 +1,7 @@
 package com.flora30.divecore.mechanic;
 
-import com.flora30.diveapin.BlockLoc;
-import com.flora30.diveapin.LightObject;
+import com.flora30.divelib.BlockLoc;
+import com.flora30.divelib.LightObject;
 import org.bukkit.Bukkit;
 import org.bukkit.Location;
 import org.bukkit.Material;

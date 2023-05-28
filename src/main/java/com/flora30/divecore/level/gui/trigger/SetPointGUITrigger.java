@@ -1,12 +1,12 @@
 package com.flora30.divecore.level.gui.trigger;
 
-import com.flora30.diveapin.data.player.LevelData;
-import com.flora30.diveapin.data.player.PlayerDataObject;
+import com.flora30.divelib.data.player.LevelData;
+import com.flora30.divelib.data.player.PlayerDataObject;
 import com.flora30.divecore.DiveCore;
 import com.flora30.divecore.level.LevelMain;
 import com.flora30.divecore.level.gui.SetPointGUI;
-import com.flora30.divenew.data.PointObject;
-import com.flora30.divenew.data.PointType;
+import com.flora30.diveconstant.data.PointObject;
+import com.flora30.diveconstant.data.PointType;
 import org.bukkit.Material;
 import org.bukkit.Sound;
 import org.bukkit.entity.Player;

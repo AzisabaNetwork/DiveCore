@@ -1,11 +1,11 @@
 package com.flora30.divecore.help;
 
-import com.flora30.diveapin.data.player.PlayerData;
-import com.flora30.diveapin.data.player.PlayerDataObject;
-import com.flora30.diveapin.util.GuiItem;
+import com.flora30.divelib.data.player.PlayerData;
+import com.flora30.divelib.data.player.PlayerDataObject;
+import com.flora30.divelib.util.GuiItem;
 import com.flora30.divecore.menu.MenuMain;
-import com.flora30.divenew.data.Help;
-import com.flora30.divenew.data.HelpObject;
+import com.flora30.diveconstant.data.Help;
+import com.flora30.diveconstant.data.HelpObject;
 import org.bukkit.Bukkit;
 import org.bukkit.Sound;
 import org.bukkit.entity.Player;

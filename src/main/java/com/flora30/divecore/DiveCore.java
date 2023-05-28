@@ -1,6 +1,6 @@
 package com.flora30.divecore;
 
-import com.flora30.diveapin.Ready;
+import com.flora30.divelib.Ready;
 import com.flora30.divecore.tools.ClearTrigger;
 import com.flora30.divecore.display.SideBar;
 import com.flora30.divecore.mechanic.Light;

@@ -1,6 +1,6 @@
 package com.flora30.divecore.data;
 
-import com.flora30.diveapin.data.player.*;
+import com.flora30.divelib.data.player.*;
 import com.flora30.divecore.DiveCore;
 import com.flora30.divecore.display.SideBar;
 import com.flora30.divecore.level.LevelMain;

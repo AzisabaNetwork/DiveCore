@@ -1,11 +1,11 @@
 package com.flora30.divecore.data;
 
-import com.flora30.diveapin.ItemMain;
-import com.flora30.diveapin.util.PlayerItem;
+import com.flora30.divelib.ItemMain;
+import com.flora30.divelib.util.PlayerItem;
 import com.flora30.divecore.tools.StringUtil;
-import com.flora30.divenew.data.item.ItemData;
-import com.flora30.divenew.data.item.ItemDataObject;
-import com.flora30.divenew.data.item.ItemType;
+import com.flora30.diveconstant.data.item.ItemData;
+import com.flora30.diveconstant.data.item.ItemDataObject;
+import com.flora30.diveconstant.data.item.ItemType;
 import org.bukkit.Location;
 import org.bukkit.entity.Player;
 import org.bukkit.inventory.Inventory;

@@ -1,7 +1,7 @@
 package com.flora30.divecore.display.sidebar;
 
-import com.flora30.diveapin.data.player.PlayerData;
-import com.flora30.diveapin.data.player.PlayerDataObject;
+import com.flora30.divelib.data.player.PlayerData;
+import com.flora30.divelib.data.player.PlayerDataObject;
 import com.flora30.divecore.data.PlayerDataMain;
 import org.bukkit.ChatColor;
 import org.bukkit.entity.Player;

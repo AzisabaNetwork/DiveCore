@@ -1,12 +1,12 @@
 package com.flora30.divecore.base;
 
-import com.flora30.diveapin.DiveAPIN;
-import com.flora30.diveapin.data.Base;
-import com.flora30.diveapin.data.BaseObject;
-import com.flora30.diveapin.event.LayerLoadEvent;
+import com.flora30.divelib.divelib;
+import com.flora30.divelib.data.Base;
+import com.flora30.divelib.data.BaseObject;
+import com.flora30.divelib.event.LayerLoadEvent;
 import com.flora30.divecore.DiveCore;
-import com.flora30.divenew.data.BaseDataObject;
-import com.flora30.divenew.data.BaseLocation;
+import com.flora30.diveconstant.data.BaseDataObject;
+import com.flora30.diveconstant.data.BaseLocation;
 import io.lumine.xikage.mythicmobs.MythicMobs;
 import io.lumine.xikage.mythicmobs.api.exceptions.InvalidMobTypeException;
 import org.bukkit.Bukkit;

@@ -2,10 +2,10 @@ package com.flora30.divecore.level;
 
 import com.flora30.divecore.DiveCore;
 import com.flora30.divecore.tools.Config;
-import com.flora30.divenew.data.LevelObject;
-import com.flora30.divenew.data.Point;
-import com.flora30.divenew.data.PointObject;
-import com.flora30.divenew.data.PointType;
+import com.flora30.diveconstant.data.LevelObject;
+import com.flora30.diveconstant.data.Point;
+import com.flora30.diveconstant.data.PointObject;
+import com.flora30.diveconstant.data.PointType;
 import org.bukkit.Bukkit;
 import org.bukkit.configuration.ConfigurationSection;
 import org.bukkit.configuration.file.FileConfiguration;

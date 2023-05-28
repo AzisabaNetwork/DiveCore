@@ -1,11 +1,11 @@
 package com.flora30.divecore.base.gui;
 
-import com.flora30.diveapin.ItemMain;
-import com.flora30.diveapin.data.Base;
-import com.flora30.diveapin.data.BaseObject;
-import com.flora30.diveapin.util.GuiItem;
+import com.flora30.divelib.ItemMain;
+import com.flora30.divelib.data.Base;
+import com.flora30.divelib.data.BaseObject;
+import com.flora30.divelib.util.GuiItem;
 import com.flora30.divecore.base.BaseMain;
-import com.flora30.divenew.data.*;
+import com.flora30.diveconstant.data.*;
 import org.bukkit.Bukkit;
 import org.bukkit.ChatColor;
 import org.bukkit.Location;

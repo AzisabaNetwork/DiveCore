@@ -1,14 +1,14 @@
 package com.flora30.divecore.base.gui.trigger;
 
-import com.flora30.diveapin.data.Base;
-import com.flora30.diveapin.data.BaseObject;
-import com.flora30.diveapin.util.DMythicUtil;
-import com.flora30.diveapin.util.PlayerItem;
+import com.flora30.divelib.data.Base;
+import com.flora30.divelib.data.BaseObject;
+import com.flora30.divelib.util.DMythicUtil;
+import com.flora30.divelib.util.PlayerItem;
 import com.flora30.divecore.base.BaseMain;
 import com.flora30.divecore.base.gui.BaseGUI;
 import com.flora30.divecore.tools.SoundUtil;
 import com.flora30.divecore.tools.type.DiveSound;
-import com.flora30.divenew.data.*;
+import com.flora30.diveconstant.data.*;
 import org.bukkit.*;
 import org.bukkit.entity.Entity;
 import org.bukkit.entity.Player;

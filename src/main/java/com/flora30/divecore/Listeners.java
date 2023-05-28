@@ -1,10 +1,11 @@
 package com.flora30.divecore;
 
-import com.flora30.diveapin.event.HelpEvent;
-import com.flora30.diveapin.event.LayerChangeEvent;
-import com.flora30.diveapin.event.LayerLoadEvent;
+import com.flora30.divelib.event.HelpEvent;
+import com.flora30.divelib.event.LayerChangeEvent;
+import com.flora30.divelib.event.LayerLoadEvent;
 import com.flora30.divecore.api.event.RegisterSideBarEvent;
 import com.flora30.divecore.base.BaseTrigger;
+import com.flora30.divecore.base.gui.EnderChestGUI;
 import com.flora30.divecore.base.gui.trigger.BaseGUITrigger;
 import com.flora30.divecore.base.gui.trigger.BaseUpgradeGUITrigger;
 import com.flora30.divecore.data.DataTrigger;
@@ -40,6 +41,7 @@ import org.bukkit.event.entity.EntityRegainHealthEvent;
 import org.bukkit.event.entity.FoodLevelChangeEvent;
 import org.bukkit.event.entity.PlayerDeathEvent;
 import org.bukkit.event.inventory.InventoryClickEvent;
+import org.bukkit.event.inventory.InventoryCloseEvent;
 import org.bukkit.event.inventory.InventoryDragEvent;
 import org.bukkit.event.inventory.InventoryMoveItemEvent;
 import org.bukkit.event.player.*;
@@ -180,6 +182,7 @@ public class Listeners implements Listener, CommandExecutor {
             case "メニュー" -> MenuGUITrigger.onClick(e);
             case "ヘルプ一覧" -> HelpGUI.onClick(e);
             case "死亡する？" -> DeathGUI.onClick(e);
+            case "エンダーチェスト" -> EnderChestGUI.onClick(e);
         }
     }
 
@@ -188,8 +191,14 @@ public class Listeners implements Listener, CommandExecutor {
         LevelTrigger.onInventoryDrag(e);
         MenuTrigger.onDrag(e);
         switch(e.getView().getTitle()){
-            case "拠点強化":
-                BaseUpgradeGUITrigger.onDrag(e);
+            case "拠点強化" -> BaseUpgradeGUITrigger.onDrag(e);
+        }
+    }
+
+    @EventHandler
+    public void onInventoryClose(InventoryCloseEvent e){
+        switch (e.getView().getTitle()){
+            case "エンダーチェスト" -> EnderChestGUI.onClose(e);
         }
     }
 

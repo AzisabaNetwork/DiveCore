@@ -1,6 +1,6 @@
 package com.flora30.divecore.menu;
 
-import com.flora30.diveapin.util.GuiItem;
+import com.flora30.divelib.util.GuiItem;
 import com.flora30.divecore.tools.SoundUtil;
 import com.flora30.divecore.tools.type.DiveSound;
 import org.bukkit.Bukkit;

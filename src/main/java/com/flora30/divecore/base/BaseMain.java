@@ -1,15 +1,15 @@
 package com.flora30.divecore.base;
 
-import com.flora30.diveapin.data.Base;
-import com.flora30.diveapin.data.BaseObject;
-import com.flora30.diveapin.data.player.PlayerData;
-import com.flora30.diveapin.data.player.PlayerDataObject;
-import com.flora30.diveapin.event.HelpEvent;
-import com.flora30.diveapin.event.HelpType;
+import com.flora30.divelib.data.Base;
+import com.flora30.divelib.data.BaseObject;
+import com.flora30.divelib.data.player.PlayerData;
+import com.flora30.divelib.data.player.PlayerDataObject;
+import com.flora30.divelib.event.HelpEvent;
+import com.flora30.divelib.event.HelpType;
 import com.flora30.divecore.base.gui.BaseGUI;
-import com.flora30.divenew.data.BaseDataObject;
-import com.flora30.divenew.data.BaseLocation;
-import com.flora30.divenew.data.LayerObject;
+import com.flora30.diveconstant.data.BaseDataObject;
+import com.flora30.diveconstant.data.BaseLocation;
+import com.flora30.diveconstant.data.LayerObject;
 import org.bukkit.Bukkit;
 import org.bukkit.Location;
 import org.bukkit.block.data.type.Campfire;

@@ -1,6 +1,6 @@
 package com.flora30.divecore.menu;
 
-import com.flora30.diveapin.util.PlayerItem;
+import com.flora30.divelib.util.PlayerItem;
 import org.bukkit.Material;
 import org.bukkit.entity.Player;
 import org.bukkit.event.block.Action;

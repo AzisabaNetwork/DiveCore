@@ -1,8 +1,8 @@
 package com.flora30.divecore.display;
 
 
-import com.flora30.diveapin.data.player.PlayerData;
-import com.flora30.diveapin.data.player.PlayerDataObject;
+import com.flora30.divelib.data.player.PlayerData;
+import com.flora30.divelib.data.player.PlayerDataObject;
 import com.flora30.divecore.display.sidebar.*;
 import com.flora30.divecore.api.event.RegisterSideBarEvent;
 import org.bukkit.Material;

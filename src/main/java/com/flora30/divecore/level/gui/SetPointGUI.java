@@ -1,12 +1,12 @@
 package com.flora30.divecore.level.gui;
 
-import com.flora30.diveapin.data.player.LevelData;
-import com.flora30.diveapin.data.player.PlayerDataObject;
-import com.flora30.diveapin.util.GuiItem;
-import com.flora30.diveapin.util.GuiItemType;
-import com.flora30.divenew.data.Point;
-import com.flora30.divenew.data.PointObject;
-import com.flora30.divenew.data.PointType;
+import com.flora30.divelib.data.player.LevelData;
+import com.flora30.divelib.data.player.PlayerDataObject;
+import com.flora30.divelib.util.GuiItem;
+import com.flora30.divelib.util.GuiItemType;
+import com.flora30.diveconstant.data.Point;
+import com.flora30.diveconstant.data.PointObject;
+import com.flora30.diveconstant.data.PointType;
 import org.bukkit.Bukkit;
 import org.bukkit.ChatColor;
 import org.bukkit.entity.Player;

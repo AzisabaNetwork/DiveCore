@@ -1,10 +1,10 @@
 package com.flora30.divecore.help;
 
-import com.flora30.diveapin.event.HelpType;
+import com.flora30.divelib.event.HelpType;
 import com.flora30.divecore.DiveCore;
 import com.flora30.divecore.tools.Config;
-import com.flora30.divenew.data.Help;
-import com.flora30.divenew.data.HelpObject;
+import com.flora30.diveconstant.data.Help;
+import com.flora30.diveconstant.data.HelpObject;
 import org.bukkit.Bukkit;
 import org.bukkit.ChatColor;
 import org.bukkit.Material;

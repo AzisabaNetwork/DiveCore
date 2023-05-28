@@ -1,7 +1,7 @@
 package com.flora30.divecore.level.gui;
 
-import com.flora30.diveapin.util.GuiItem;
-import com.flora30.diveapin.util.GuiItemType;
+import com.flora30.divelib.util.GuiItem;
+import com.flora30.divelib.util.GuiItemType;
 import org.bukkit.Bukkit;
 import org.bukkit.entity.Player;
 import org.bukkit.inventory.Inventory;
