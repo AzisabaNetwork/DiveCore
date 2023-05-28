@@ -26,7 +26,7 @@ public class MenuGUI {
     public static Inventory getGui(Player player){
         Inventory inv = Bukkit.createInventory(null,45,"メニュー");
         GuiItem.INSTANCE.grayBack(inv);
-        String name = QuestAPI.getStory(PlayerDataObject.INSTANCE.getPlayerDataMap().get(player.getUniqueId()).getLayerData().getLayer()).displayName;
+        String name = LayerObject.INSTANCE.getLayerMap().get(PlayerDataObject.INSTANCE.getPlayerDataMap().get(player.getUniqueId()).getLayerData().getLayer()).getDisplayName();
         inv.setItem(4,getTitled(new ItemStack(Material.GRASS_BLOCK),ChatColor.GOLD+"エリア ‣ " +ChatColor.WHITE+ name));
 
         inv.setItem(10,getTitled(GuiItem.INSTANCE.getItem(GuiItemType.Point),ChatColor.GOLD+"現在のステータスを確認する"));

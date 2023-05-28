@@ -1,8 +1,8 @@
 package com.flora30.divecore.tools.deprecated;
 
-import com.flora30.diveapi.data.PlayerData;
-import com.flora30.divecore.data.PlayerDataMain;
-import com.flora30.divecore.tools.Mathing;
+import com.flora30.divelib.data.player.PlayerData;
+import com.flora30.divelib.data.player.PlayerDataObject;
+import com.flora30.divelib.util.Mathing;
 import org.bukkit.Bukkit;
 import org.bukkit.entity.LivingEntity;
 import org.bukkit.entity.Player;
@@ -14,8 +14,6 @@ public class Slide {
     //坂が無いとき現在の速度を判定して減速する
     //落ちているとき「加速」を貯めて、落下後に反映する
     private static final Map<UUID, Double> stackVec = new HashMap<>();
-
-    final Mathing mathing = new Mathing();
 
     /*public void test(Player player) {
         double relSimpleX = mathing.getSimpleXFromYaw(player.getLocation().getYaw()) * 100;
@@ -30,8 +28,8 @@ public class Slide {
 
     public void slide(Player player) {
         UUID id = player.getUniqueId();
-        double relSimpleX = mathing.getSimpleXFromYaw(player.getLocation().getYaw());
-        double relSimpleZ = mathing.getSimpleZFromYaw(player.getLocation().getYaw());
+        double relSimpleX = Mathing.INSTANCE.getSimpleXFromYaw(player.getLocation().getYaw());
+        double relSimpleZ = Mathing.INSTANCE.getSimpleZFromYaw(player.getLocation().getYaw());
         
 
         if (!((LivingEntity) player).isOnGround()) {
@@ -41,9 +39,9 @@ public class Slide {
                 return;
             }
             //スタミナを消費
-            PlayerData playerData = PlayerDataMain.getPlayerData(player.getUniqueId());
-            if (playerData.currentST > 0){
-                playerData.currentST--;
+            PlayerData playerData = PlayerDataObject.INSTANCE.getPlayerDataMap().get(player.getUniqueId());
+            if (playerData.getCurrentST() > 0){
+                playerData.setCurrentST(playerData.getCurrentST()-1);
             }
             else{
                 return;

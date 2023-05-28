@@ -1,13 +1,8 @@
 package com.flora30.divecore.display.sidebar;
 
-import com.flora30.diveapi.data.Mission;
-import com.flora30.diveapi.data.player.NpcData;
-import com.flora30.diveapi.plugins.QuestAPI;
 import com.flora30.divelib.data.player.NpcData;
 import com.flora30.divelib.data.player.PlayerData;
 import com.flora30.divelib.data.player.PlayerDataObject;
-import com.flora30.divecore.data.PlayerDataMain;
-import org.bukkit.ChatColor;
 import org.bukkit.entity.Player;
 
 public class MissionMobSide extends SideOption{

@@ -1,6 +1,5 @@
 package com.flora30.divecore.base;
 
-import com.flora30.divelib.divelib;
 import com.flora30.divelib.data.Base;
 import com.flora30.divelib.data.BaseObject;
 import com.flora30.divelib.event.LayerLoadEvent;

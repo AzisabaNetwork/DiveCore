@@ -1,12 +1,12 @@
 package com.flora30.divecore;
 
-import com.flora30.divelib.Ready;
 import com.flora30.divecore.tools.ClearTrigger;
 import com.flora30.divecore.display.SideBar;
 import com.flora30.divecore.mechanic.Light;
 import com.flora30.divecore.menu.MenuMain;
 import com.flora30.divecore.data.PlayerDataConfig;
 import com.flora30.divecore.data.PlayerConfig;
+import com.flora30.divelib.DiveLib;
 import org.bukkit.Bukkit;
 import org.bukkit.ChatColor;
 import org.bukkit.configuration.file.FileConfiguration;
@@ -55,7 +55,7 @@ public final class DiveCore extends JavaPlugin {
 
         getServer().getPluginManager().registerEvents(listeners, this);
         getServer().getPluginManager().registerEvents(new ClearTrigger(),this);
-        Ready.INSTANCE.setCoreEventReady(true);
+        DiveLib.plugin.setCoreEventReady(true);
 
         //セーブ系Mainで全機能のロードを行う
         ConfigMain configMain = new ConfigMain();

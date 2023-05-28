@@ -5,12 +5,11 @@ import com.flora30.divelib.data.player.LevelData;
 import com.flora30.divelib.data.player.PlayerData;
 import com.flora30.divelib.data.player.PlayerDataObject;
 import com.flora30.divecore.DiveCore;
-import com.flora30.divecore.data.PlayerDataMain;
-import com.flora30.divecore.tools.Mathing;
 import com.flora30.diveconstant.data.Layer;
 import com.flora30.diveconstant.data.LayerObject;
 import com.flora30.diveconstant.data.LevelObject;
 import com.flora30.diveconstant.data.PointObject;
+import com.flora30.divelib.util.Mathing;
 import io.lumine.xikage.mythicmobs.io.MythicConfig;
 import io.lumine.xikage.mythicmobs.mobs.MythicMob;
 import org.bukkit.Bukkit;
@@ -19,8 +18,6 @@ import org.bukkit.attribute.Attribute;
 import org.bukkit.attribute.AttributeInstance;
 import org.bukkit.entity.*;
 
-import java.util.HashMap;
-import java.util.Map;
 import java.util.Objects;
 
 public class LevelMain {
@@ -58,8 +55,8 @@ public class LevelMain {
         }
         String str = mythicConfig.getString("Exp","0");
         String str2 = mythicConfig.getString("Level","0");
-        int exp = Mathing.getInt(str);
-        int mobLevel = Mathing.getInt(str2);
+        int exp = Mathing.INSTANCE.getInt(str);
+        int mobLevel = Mathing.INSTANCE.getInt(str2);
         //exp = applyLevelGap(playerLevel,mobLevel,exp);
         addExp(player,exp);
     }
@@ -151,13 +148,5 @@ public class LevelMain {
         }
         player.setLevel(currentLevel);
         player.setExp(progress);
-    }
-
-    public static void putGapRate(int gap, double rate){
-        //gapRateMap.put(gap,rate);
-    }
-
-    public static void setLeastGapRate(double leastGapRate) {
-        LevelMain.leastGapRate = leastGapRate;
     }
 }

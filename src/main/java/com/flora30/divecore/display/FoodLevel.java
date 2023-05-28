@@ -3,9 +3,9 @@ package com.flora30.divecore.display;
 import com.flora30.divelib.ItemMain;
 import com.flora30.divelib.data.player.PlayerData;
 import com.flora30.divelib.data.player.PlayerDataObject;
-import com.flora30.divecore.tools.Mathing;
 import com.flora30.diveconstant.data.item.ItemData;
 import com.flora30.diveconstant.data.item.ItemDataObject;
+import com.flora30.divelib.util.Mathing;
 import org.bukkit.Particle;
 import org.bukkit.attribute.Attribute;
 import org.bukkit.entity.Player;
@@ -44,7 +44,7 @@ public class FoodLevel {
             return;
         }
         //（減少判定）最小30% - 最大100%
-        if (Mathing.getRandomInt(100) < (current * 5) * 0.7 + 30){
+        if (Mathing.INSTANCE.getRandomInt(100) < (current * 5) * 0.7 + 30){
             // 隠し満腹度の消費
             /*
             if (player.getSaturation() >= 1) {
