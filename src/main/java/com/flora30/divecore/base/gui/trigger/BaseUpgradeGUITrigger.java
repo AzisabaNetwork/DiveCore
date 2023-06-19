@@ -8,7 +8,7 @@ import com.flora30.divecore.base.BaseMain;
 import com.flora30.divecore.base.gui.BaseGUI;
 import com.flora30.divecore.tools.SoundUtil;
 import com.flora30.divecore.tools.type.DiveSound;
-import com.flora30.diveconstant.data.*;
+import com.flora30.divelib.data.*;
 import org.bukkit.*;
 import org.bukkit.entity.Entity;
 import org.bukkit.entity.Player;

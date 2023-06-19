@@ -3,7 +3,7 @@ package com.flora30.divecore.base.gui;
 import com.flora30.divelib.data.player.PlayerData;
 import com.flora30.divelib.data.player.PlayerDataObject;
 import com.flora30.divelib.util.GuiItem;
-import com.flora30.diveconstant.data.WhistleObject;
+import com.flora30.divelib.data.WhistleObject;
 import org.bukkit.Bukkit;
 import org.bukkit.Material;
 import org.bukkit.entity.Player;

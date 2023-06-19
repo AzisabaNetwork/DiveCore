@@ -1,9 +1,11 @@
 package com.flora30.divecore.mechanic;
 
-import com.flora30.diveconstant.data.loot.LootObject;
+import com.flora30.divelib.data.loot.LootObject;
 import com.flora30.divelib.BlockLoc;
 import com.flora30.divelib.LightObject;
 import com.flora30.divelib.data.RopeObject;
+import com.flora30.divelib.data.player.LayerData;
+import com.flora30.divelib.data.player.PlayerDataObject;
 import org.bukkit.Bukkit;
 import org.bukkit.Location;
 import org.bukkit.Material;
@@ -159,6 +161,8 @@ public class Light {
 
         //if (!BlockUtil.isIgnoreBlockType(loc.getBlock())) return false;
         if (RopeObject.INSTANCE.isRopeLocation(player,loc)) return false;
-        return !LootObject.INSTANCE.isLootLocation(loc);
+
+        LayerData layerData = PlayerDataObject.INSTANCE.getPlayerDataMap().get(player.getUniqueId()).getLayerData();
+        return !layerData.isLootLocation(loc);
     }
 }

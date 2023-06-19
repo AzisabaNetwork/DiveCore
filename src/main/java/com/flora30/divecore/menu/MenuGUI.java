@@ -1,6 +1,6 @@
 package com.flora30.divecore.menu;
 
-import com.flora30.diveconstant.data.teleport.TravelObject;
+import com.flora30.divelib.data.teleport.TravelObject;
 import com.flora30.divelib.data.MenuSlot;
 import com.flora30.divelib.data.player.PlayerData;
 import com.flora30.divelib.data.player.PlayerDataObject;
@@ -9,9 +9,9 @@ import com.flora30.divelib.event.HelpType;
 import com.flora30.divelib.util.GuiItem;
 import com.flora30.divelib.util.GuiItemType;
 import com.flora30.divecore.data.PlayerDataMain;
-import com.flora30.diveconstant.data.LayerObject;
-import com.flora30.diveconstant.data.Whistle;
-import com.flora30.diveconstant.data.WhistleObject;
+import com.flora30.divelib.data.LayerObject;
+import com.flora30.divelib.data.Whistle;
+import com.flora30.divelib.data.WhistleObject;
 import org.bukkit.Bukkit;
 import org.bukkit.ChatColor;
 import org.bukkit.Material;

@@ -3,7 +3,7 @@ package com.flora30.divecore.display;
 import com.flora30.divelib.data.player.PlayerData;
 import com.flora30.divelib.data.player.PlayerDataObject;
 import com.flora30.divecore.data.PlayerDataMain;
-import com.flora30.diveconstant.data.LayerObject;
+import com.flora30.divelib.data.LayerObject;
 import net.md_5.bungee.api.ChatMessageType;
 import net.md_5.bungee.api.chat.TextComponent;
 import org.bukkit.Bukkit;
