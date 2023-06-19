@@ -408,6 +408,7 @@ public class PlayerDataConfig {
         Set<Integer> lootSet2 = new HashSet<>();
         Set<Integer> lootSet3 = new HashSet<>();
 
+        // location保存
         for (int id : data.getLootMap().keySet()) {
             switch (data.getLootMap().get(id)) {
                 case 1 -> lootSet1.add(id);
