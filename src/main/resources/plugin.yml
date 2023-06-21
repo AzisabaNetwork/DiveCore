@@ -4,7 +4,7 @@ main: com.flora30.divecore.DiveCore
 api-version: 1.13
 authors: [Flora]
 description: 深淵を覗くものは、深淵にもまた覗かれているのだ
-depend: [Citizens,MythicMobs,LibsDisguises,WorldEdit,ProtocolLib,DiveDB,DiveAPI]
+depend: [Citizens,MythicMobs,LibsDisguises,WorldEdit,ProtocolLib,DiveDB,DiveLib]
 loadbefore: [DiveRegion]
 commands:
   level:
