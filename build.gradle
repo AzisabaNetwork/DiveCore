@@ -59,7 +59,7 @@ dependencies {
     compileOnly 'net.citizensnpcs:citizensapi:2.0.28-SNAPSHOT'
     compileOnly 'LibsDisguises:LibsDisguises:10.0.26'
     compileOnly 'io.lumine:Mythic-Dist:5.0.0-SNAPSHOT'
-    compileOnly 'com.ticxo.modelengine:api:R2.5.0'
+    compileOnly 'com.ticxo.modelengine:api:R3.1.5'
     compileOnly 'com.comphenix.protocol:ProtocolLib:4.7.0'
     compileOnly 'com.sk89q.worldedit:worldedit-bukkit:7.2.6'
     compileOnly 'com.sk89q.worldedit:worldedit-core:7.2.6'

@@ -1,12 +1,17 @@
 package com.flora30.divecore.data;
 
+import com.flora30.divelib.data.gimmick.GimmickLog;
+import com.flora30.divelib.data.gimmick.GimmickObject;
+import com.flora30.divelib.data.gimmick.action.ChestType;
 import com.flora30.divelib.data.player.*;
 import com.flora30.divecore.DiveCore;
 import com.flora30.divecore.display.SideBar;
 import com.flora30.divecore.level.LevelMain;
 import com.flora30.divedb.DiveDBAPI;
+import org.apache.commons.lang.StringUtils;
 import org.bukkit.Bukkit;
 import org.bukkit.GameMode;
+import org.bukkit.Location;
 import org.bukkit.OfflinePlayer;
 import org.bukkit.configuration.ConfigurationSection;
 import org.bukkit.configuration.file.YamlConfiguration;
@@ -125,8 +130,9 @@ public class PlayerDataConfig {
                         DiveDBAPI.loadSQL(table,uuid,"LootLayer","no"),
                         loadLootMap(uuid),
                         loadStringSet(DiveDBAPI.loadSQL(table,uuid,"VisitedLayers","",false)),
+                        loadGimmickLogSet(uuid),
                         DiveDBAPI.loadSQL(table,uuid,"LootLayer","no"),
-                        0
+                        null
                 ),
                 loadIntegerSet(DiveDBAPI.loadSQL(table,uuid,"Helps","",false)),
                 loadIntegerSet(DiveDBAPI.loadSQL(table,uuid,"FoundRecipes","",false)),
@@ -197,16 +203,72 @@ public class PlayerDataConfig {
         return set;
     }
 
-    private HashMap<Integer, Integer> loadLootMap(UUID uuid) {
-        HashMap<Integer,Integer> map = new HashMap<>();
-        String[] keys = {"Loots_1","Loots_2","Loots_3"};
-        for (int lv = 1; lv <= 3; lv++) {
-            Set<Integer> set = loadIntegerSet(DiveDBAPI.loadSQL("loots",uuid,keys[lv - 1],"",false));
-            for (int id : set) {
-                map.put(id,lv);
-            }
+    private HashMap<Location,LootData> loadLootMap(UUID uuid) {
+        HashMap<Location,LootData> map = new HashMap<>();
+
+        // 読み込む
+        StringBuilder sb = new StringBuilder();
+        for (int i = 0; i < 5; i++){
+            String load = DiveDBAPI.loadSQL("loots",uuid,"Loots_"+i,"no");
+
+            if (!(load.equals("no"))) sb.append(load);
         }
+
+        // _ 分割する
+        String[] lootArray = sb.toString().split("_");
+        for (String str : lootArray) {
+            if (Objects.equals(str, "no")) continue;
+
+            try {
+                String[] array = str.split("[XYZTL]");
+                String world = array[0];
+                int x = Integer.parseInt(array[1]);
+                int y = Integer.parseInt(array[2]);
+                int z = Integer.parseInt(array[3]);
+                ChestType type = ChestType.values()[Integer.parseInt(array[4])];
+                int level = Integer.parseInt(array[5]);
+
+                Location location = new Location(Bukkit.getWorld(world),x,y,z);
+                LootData data = new LootData(type,level);
+                map.put(location,data);
+            } catch (NumberFormatException|ArrayIndexOutOfBoundsException ignored){}
+        }
+
         return map;
+    }
+
+    private HashSet<GimmickLog> loadGimmickLogSet(UUID uuid){
+        HashSet<GimmickLog> set = new HashSet<>();
+
+        // 読み込む
+        StringBuilder sb = new StringBuilder();
+        for (int i = 0; i < 5; i++){
+            String load = DiveDBAPI.loadSQL("gimmicks",uuid,"Gimmicks_"+i,"no");
+
+            if (!(load.equals("no"))) sb.append(load);
+        }
+
+        // _ 分割する
+        String[] lootArray = sb.toString().split("_");
+        for (String str : lootArray) {
+            if (Objects.equals(str, "no")) continue;
+
+            try {
+                String[] array = str.split("[XYZGT]");
+                String world = array[0];
+                int x = Integer.parseInt(array[1]);
+                int y = Integer.parseInt(array[2]);
+                int z = Integer.parseInt(array[3]);
+                String gimmickID = GimmickObject.INSTANCE.getStringID(Integer.parseInt(array[3]));
+                if(gimmickID == null) continue;
+
+                Location location = new Location(Bukkit.getWorld(world),x,y,z);
+                GimmickLog log = new GimmickLog(location,gimmickID,System.currentTimeMillis());
+                set.add(log);
+            } catch (NumberFormatException|ArrayIndexOutOfBoundsException ignored){}
+        }
+
+        return set;
     }
 
 
@@ -330,6 +392,7 @@ public class PlayerDataConfig {
 
             //map・set系は別関数
             saveLootMap(uuid,layerData);
+            saveGimmickMap(uuid,layerData);
             DiveDBAPI.saveSQL(table,uuid,"TalkProgress",convIntegerMap(npcData.getTalkProgressMap()),false);
             DiveDBAPI.saveSQL(table,uuid,"VisitedLayers",convStringSet(layerData.getVisitedLayers()),false);
             DiveDBAPI.saveSQL(table,uuid,"Helps",convIntSet(data.getHelpIdSet()),false);
@@ -404,22 +467,84 @@ public class PlayerDataConfig {
 
     private void saveLootMap(UUID uuid, LayerData data){
 
-        Set<Integer> lootSet1 = new HashSet<>();
-        Set<Integer> lootSet2 = new HashSet<>();
-        Set<Integer> lootSet3 = new HashSet<>();
+        // Location + LootData 保存
+        // まず、すべてまとめて一つのStringにする
+        StringBuilder sb = new StringBuilder();
+        boolean isAfter = false;
+        for (Map.Entry<Location, LootData> lootEntry : data.getLootMap().entrySet()) {
+            Location loc = lootEntry.getKey();
+            LootData lootData = lootEntry.getValue();
 
-        // location保存
-        for (int id : data.getLootMap().keySet()) {
-            switch (data.getLootMap().get(id)) {
-                case 1 -> lootSet1.add(id);
-                case 2 -> lootSet2.add(id);
-                case 3 -> lootSet3.add(id);
-            }
+            if (isAfter) sb.append("_");
+            sb.append(loc.getWorld().getName())
+                    .append("X").append(loc.getBlockX())
+                    .append("Y").append(loc.getBlockY())
+                    .append("Z").append(loc.getBlockZ())
+                    .append("T").append(lootData.getType().ordinal())
+                    .append("L").append(lootData.getLevel());
+            isAfter = true;
+        }
+        String str = sb.toString();
+
+        // 分割する
+        List<String> splitList = new ArrayList<>();
+        for (int i = 0; i < StringUtils.length(str); i += 10000) {
+            splitList.add(StringUtils.substring(str, i, i + 10000));
         }
 
-        DiveDBAPI.saveSQL("loots",uuid,"Loots_1",convIntSet(lootSet1),false);
-        DiveDBAPI.saveSQL("loots",uuid,"Loots_2",convIntSet(lootSet2),false);
-        DiveDBAPI.saveSQL("loots",uuid,"Loots_3",convIntSet(lootSet3),false);
+        // 保存する
+        for (int i = 0; i < 5; i++){
+
+            // 何もない場合は'no'
+            if (splitList.size() <= i) {
+                DiveDBAPI.saveSQL("loots",uuid,"Loots_"+i,"'no'",false);
+            }
+            else{
+                DiveDBAPI.saveSQL("loots",uuid,"Loots_"+i,"'"+ splitList.get(i) +"'",false);
+            }
+
+        }
     }
 
+    private void saveGimmickMap(UUID uuid, LayerData data){
+
+        // Location + GimmickLog 保存
+        // まず、すべてまとめて一つのStringにする
+        StringBuilder sb = new StringBuilder();
+        boolean isAfter = false;
+        for (GimmickLog log : data.getGimmickLogs()) {
+
+            // 保存しないはずのデータは登録しない
+            if(GimmickObject.INSTANCE.getIntID(log.getGimmickID()) == -1) continue;
+
+            Location loc = log.getLocation();
+            if (isAfter) sb.append("_");
+            sb.append(loc.getWorld().getName())
+                    .append("X").append(loc.getBlockX())
+                    .append("Y").append(loc.getBlockY())
+                    .append("Z").append(loc.getBlockZ())
+                    .append("G").append(GimmickObject.INSTANCE.getIntID(log.getGimmickID()));
+            isAfter = true;
+        }
+        String str = sb.toString();
+
+        // 分割する
+        List<String> splitList = new ArrayList<>();
+        for (int i = 0; i < StringUtils.length(str); i += 10000) {
+            splitList.add(StringUtils.substring(str, i, i + 10000));
+        }
+
+        // 保存する
+        for (int i = 0; i < 5; i++){
+
+            // 何もない場合は'no'
+            if (splitList.size() <= i) {
+                DiveDBAPI.saveSQL("gimmicks",uuid,"Gimmicks_"+i,"'no'",false);
+            }
+            else{
+                DiveDBAPI.saveSQL("gimmicks",uuid,"Gimmicks_"+i,"'"+ splitList.get(i) +"'",false);
+            }
+
+        }
+    }
 }
