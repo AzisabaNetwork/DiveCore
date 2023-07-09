@@ -6,6 +6,7 @@ import com.flora30.divelib.data.player.PlayerData;
 import com.flora30.divelib.data.player.PlayerDataObject;
 import com.flora30.divelib.event.HelpEvent;
 import com.flora30.divelib.event.HelpType;
+import com.flora30.divelib.event.MenuOpenEvent;
 import com.flora30.divelib.util.GuiItem;
 import com.flora30.divelib.util.GuiItemType;
 import com.flora30.divecore.data.PlayerDataMain;
@@ -21,10 +22,7 @@ import org.bukkit.inventory.ItemFlag;
 import org.bukkit.inventory.ItemStack;
 import org.bukkit.inventory.meta.ItemMeta;
 
-import java.util.ArrayList;
-import java.util.EnumMap;
-import java.util.List;
-import java.util.Map;
+import java.util.*;
 
 public class MenuGUI {
 
@@ -35,18 +33,12 @@ public class MenuGUI {
         String name = LayerObject.INSTANCE.getLayerMap().get(PlayerDataObject.INSTANCE.getPlayerDataMap().get(player.getUniqueId()).getLayerData().getLayer()).getDisplayName();
         inv.setItem(4,getTitled(new ItemStack(Material.GRASS_BLOCK),ChatColor.GOLD+"エリア ‣ " +ChatColor.WHITE+ name));
 
-        //fin inv.setItem(10,getTitled(GuiItem.INSTANCE.getItem(GuiItemType.Point),ChatColor.GOLD+"現在のステータスを確認する"));
-
-        //fin inv.setItem(12,getTitled(new ItemStack(Material.CRAFTING_TABLE),ChatColor.GOLD+"クラフトをする"));
-
-        //fin inv.setItem(14,getTravelIcon(player));
-
         inv.setItem(16,getReturn(player));
 
-        //fin inv.setItem(28,getTitled(GuiItem.INSTANCE.getItem(GuiItemType.Help),ChatColor.GOLD+"ヘルプを見る"));
-
-        //fin inv.setItem(34,DeathGUI.getDeathIcon());
-
+        MenuOpenEvent event = new MenuOpenEvent(player,new HashMap<>());
+        for (Map.Entry<MenuSlot, ItemStack> entry : event.getIconMap().entrySet()) {
+            inv.setItem(getInventorySlot(entry.getKey()), entry.getValue());
+        }
         return inv;
     }
 
@@ -124,5 +116,18 @@ public class MenuGUI {
 
         icon.setItemMeta(meta);
         return icon;
+    }
+
+    public static int getInventorySlot(MenuSlot slot) {
+        return switch (slot) {
+            case Slot1 -> 10;
+            case Slot2 -> 12;
+            case Slot3 -> 14;
+            case Slot4 -> 16;
+            case Slot5 -> 28;
+            case Slot6 -> 30;
+            case Slot7 -> 32;
+            case Slot8 -> 34;
+        };
     }
 }

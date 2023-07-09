@@ -1,5 +1,6 @@
 package com.flora30.divecore.menu;
 
+import com.flora30.divelib.data.MenuSlot;
 import com.flora30.divelib.event.HelpEvent;
 import com.flora30.divelib.event.HelpType;
 import org.bukkit.Bukkit;
