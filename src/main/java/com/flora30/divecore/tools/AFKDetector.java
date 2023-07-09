@@ -60,6 +60,7 @@ public class AFKDetector {
 
     public static void onMove(PlayerMoveEvent e) {
         PlayerData data = PlayerDataObject.INSTANCE.getPlayerDataMap().get(e.getPlayer().getUniqueId());
+        if (data == null) return;
 
         if (data.getAfkTime() >= 5) {
             e.getPlayer().sendMessage(ChatColor.GRAY + "AFK状態を解除しました");

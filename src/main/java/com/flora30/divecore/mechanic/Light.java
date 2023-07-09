@@ -92,6 +92,9 @@ public class Light {
     }
 
     public static void bright(Player player){
+        // PlayerDataが無い場合は何もしない
+        if (PlayerDataObject.INSTANCE.getPlayerDataMap().get(player.getUniqueId()) == null) return;
+
         Location lightLocation = getLightAbleLocation(player, player.getLocation().add(0,1,0));
 
         if (lightLocation != null) {
