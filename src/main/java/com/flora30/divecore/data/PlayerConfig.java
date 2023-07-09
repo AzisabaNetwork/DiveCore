@@ -52,14 +52,14 @@ public class PlayerConfig {
 
     public void load(Player player){
         if(DiveCore.plugin.isEnabled()){
-            DiveCore.plugin.asyncTask(() -> loadExecute(player));
+            DiveCore.plugin.asyncTask(() -> loadExecute(player, true));
         }
         else{
-            loadExecute(player);
+            loadExecute(player, false);
         }
     }
 
-    public void loadExecute(Player player){
+    public void loadExecute(Player player, boolean isAsync){
         // 処理時間を計測する
         long firstTime = System.currentTimeMillis();
 
@@ -77,7 +77,7 @@ public class PlayerConfig {
         //InvItem
         PlayerInventory playerInv = player.getInventory();
         for(int i = 0; i < 41; i++){
-            ItemStack item = loadItem(table, uuid, invItemLabels.get(i));
+            ItemStack item = loadItem(table, uuid, invItemLabels.get(i), isAsync);
             playerInv.setItem(i,item);
         }
 
@@ -85,7 +85,7 @@ public class PlayerConfig {
         Inventory enderInv = player.getEnderChest();
         enderInv.clear();
         for (int i = 0; i < 27; i++){
-            ItemStack item = loadItem(table, uuid, enderItemLabels.get(i));
+            ItemStack item = loadItem(table, uuid, enderItemLabels.get(i), isAsync);
             enderInv.setItem(i,item);
         }
 
@@ -178,7 +178,26 @@ public class PlayerConfig {
             long lastTime = System.currentTimeMillis();
             long taskTime = (lastTime - firstTime);
             Bukkit.getLogger().info("[DiveCore-Player]"+playerLog.name+"をセーブしました（"+taskTime+"ms）");
+
+            // PlayerDataConfigのセーブを待つ
+            checkSave(player.getUniqueId());
         });
+    }
+
+    // セーブを完了したことを伝える
+    // PlayerDataConfigのセーブを待つ
+    public static void checkSave(UUID id){
+        // PlayerDataConfigのセーブが完了するとMapからidが削除される
+        if ( PlayerDataObject.INSTANCE.getPlayerDataMap().containsKey(id)) {
+            // まだセーブが完了していない時
+            DiveCore.plugin.delayedTask(3,() -> checkSave(id));
+        }
+        else {
+            // セーブが完了したとき
+            String table = "player_data";
+            DiveDBAPI.insertSQL(table,id);
+            DiveDBAPI.saveSQL(table,id,"IsSaving",String.valueOf(false));
+        }
     }
 
     private Location loadLocation(String table, UUID uuid, String label){
@@ -245,7 +264,7 @@ public class PlayerConfig {
         DiveDBAPI.saveSQL(table,uuid,label,str);
     }
 
-    private ItemStack loadItem(String table, UUID uuid, String label){
+    private ItemStack loadItem(String table, UUID uuid, String label, boolean isAsync){
         String str = DiveDBAPI.loadSQL(table,uuid,label,null);
         if (str == null){
             return null;
@@ -269,7 +288,7 @@ public class PlayerConfig {
             return null;
         }
 
-        ItemStack item = ItemMain.INSTANCE.getItemWithValue(itemId,addition1);
+        ItemStack item = ItemMain.INSTANCE.getItemWithValue(itemId,addition1,isAsync);
         if (item != null){
             item.setAmount(amount);
         }

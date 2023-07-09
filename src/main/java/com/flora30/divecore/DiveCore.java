@@ -10,6 +10,7 @@ import com.flora30.divelib.DiveLib;
 import org.bukkit.Bukkit;
 import org.bukkit.ChatColor;
 import org.bukkit.configuration.file.FileConfiguration;
+import org.bukkit.entity.Player;
 import org.bukkit.plugin.PluginManager;
 import org.bukkit.plugin.RegisteredServiceProvider;
 import org.bukkit.plugin.java.JavaPlugin;
@@ -83,12 +84,23 @@ public final class DiveCore extends JavaPlugin {
 
         Light.lightStop();
 
+        saveAllPlayers();
+    }
+
+    public void saveAllPlayers() {
         PlayerConfig playerConfig = new PlayerConfig();
-        playerConfig.saveAll();
-
         PlayerDataConfig playerDataConfig = new PlayerDataConfig();
-        playerDataConfig.saveAll();
+        playerDataConfig.saveConfig();
 
+        for (Player player : Bukkit.getServer().getOnlinePlayers()) {
+            playerDataConfig.setSaving(player.getUniqueId(),true);
+
+            playerDataConfig.save(player.getUniqueId());
+            playerConfig.save(player);
+
+            playerDataConfig.setSaving(player.getUniqueId(),false);
+        }
+        Bukkit.getLogger().info("[DiveCore-Data]接続中のプレイヤーのデータを最終セーブしました");
     }
 
 

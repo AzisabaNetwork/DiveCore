@@ -88,6 +88,20 @@ public class PlayerDataConfig {
         }
     }
 
+    // ロード可能な状態か確認する
+    // 他のサーバーからセーブ中の場合はロードできない
+    public boolean canLoad(UUID uuid) {
+        String table = "player_data";
+        DiveDBAPI.insertSQL(table,uuid);
+        return Integer.parseInt(DiveDBAPI.loadSQL(table,uuid,"IsSaving","0")) == 0;
+    }
+
+    public void setSaving(UUID uuid, boolean isSaving){
+        String table = "player_data";
+        DiveDBAPI.insertSQL(table,uuid);
+        DiveDBAPI.saveSQL(table,uuid,"IsSaving",String.valueOf(isSaving));
+    }
+
     public void loadAsync(UUID uuid){
         // 処理時間を計測する
         long firstTime = System.currentTimeMillis();
@@ -102,6 +116,7 @@ public class PlayerDataConfig {
         String table = "player_data";
         DiveDBAPI.insertSQL(table,uuid);
         DiveDBAPI.insertSQL("loots",uuid);
+        DiveDBAPI.insertSQL("gimmicks",uuid);
 
         PlayerData data = new PlayerData(
                 new LevelData(
@@ -254,12 +269,12 @@ public class PlayerDataConfig {
             if (Objects.equals(str, "no")) continue;
 
             try {
-                String[] array = str.split("[XYZGT]");
+                String[] array = str.split("[XYZG]");
                 String world = array[0];
                 int x = Integer.parseInt(array[1]);
                 int y = Integer.parseInt(array[2]);
                 int z = Integer.parseInt(array[3]);
-                String gimmickID = GimmickObject.INSTANCE.getStringID(Integer.parseInt(array[3]));
+                String gimmickID = GimmickObject.INSTANCE.getStringID(Integer.parseInt(array[4]));
                 if(gimmickID == null) continue;
 
                 Location location = new Location(Bukkit.getWorld(world),x,y,z);
@@ -272,7 +287,7 @@ public class PlayerDataConfig {
     }
 
 
-    public void saveAll(){
+    public void saveConfig(){
         YamlConfiguration config = YamlConfiguration.loadConfiguration(configFile);
         /////////////////////////////////////////////////
         List<String> adminList = new ArrayList<>();
@@ -291,12 +306,6 @@ public class PlayerDataConfig {
             e.printStackTrace();
         }
         Bukkit.getLogger().info("[DiveCore-Data]adminリストをセーブしました");
-
-
-        for (UUID id : PlayerDataObject.INSTANCE.getPlayerDataMap().keySet()){
-            save(id);
-        }
-        Bukkit.getLogger().info("[DiveCore-Data]全プレイヤーのデータを最終セーブしました");
     }
 
     public void save(UUID uuid){

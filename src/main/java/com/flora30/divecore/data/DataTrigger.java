@@ -16,18 +16,31 @@ import java.util.*;
 public class DataTrigger {
     public static boolean logMode = false;
 
+    private static final PlayerDataConfig playerDataConfig = new PlayerDataConfig();
+    private static final PlayerConfig playerConfig = new PlayerConfig();
+
     public static void onJoin(PlayerJoinEvent e){
         PlayerDataObject.INSTANCE.getPlayerIdMap().put(e.getPlayer().getDisplayName(),e.getPlayer().getUniqueId());
-        DiveCore.plugin.delayedTask(1, () -> {
-            PlayerDataConfig ls = new PlayerDataConfig();
-            ls.load(e.getPlayer().getUniqueId());
-            PlayerConfig playerConfig = new PlayerConfig();
-            playerConfig.load(e.getPlayer());
-
-            checkFirstJoin(e.getPlayer());
-        });
-        resetGameMode(e.getPlayer().getUniqueId());
+        loadCheck(e.getPlayer());
     }
+
+    // ロード可能な状態であればロードする
+    private static void loadCheck(Player player){
+        if (playerDataConfig.canLoad(player.getUniqueId())) {
+            DiveCore.plugin.delayedTask(1, () -> {
+                playerDataConfig.load(player.getUniqueId());
+                playerConfig.load(player);
+
+                checkFirstJoin(player);
+            });
+            resetGameMode(player.getUniqueId());
+        }
+        else {
+            DiveCore.plugin.delayedTask(5, () -> loadCheck(player));
+            resetGameMode(player.getUniqueId());
+        }
+    }
+
 
     private static void checkFirstJoin(Player player) {
         PlayerData data = PlayerDataObject.INSTANCE.getPlayerDataMap().get(player.getUniqueId());
@@ -67,17 +80,13 @@ public class DataTrigger {
     }
 
     public static void onLogout(PlayerQuitEvent e){
-        PlayerDataConfig ls = new PlayerDataConfig();
-        ls.saveAsync(e.getPlayer().getUniqueId());
-        PlayerConfig playerConfig = new PlayerConfig();
+        playerDataConfig.setSaving(e.getPlayer().getUniqueId(),true);
+        playerDataConfig.saveAsync(e.getPlayer().getUniqueId());
         playerConfig.saveAsync(e.getPlayer());
+
+        // playerConfigの最後でsaving = falseになる
     }
 
-
-
-    /*
-
-     */
 
     public static void onCommand(String command, String command2){
         Set<UUID> adminSet = PlayerDataObject.INSTANCE.getAdminSet();
